@@ -1,0 +1,12 @@
+{
+  "name": "cv-filosofo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CV de Filosofía de Steven Vallejo Ortiz — sitio estatico bilingue (ES/EN). Filosofo / Logica formal.",
+  "scripts": {
+    "dev": "npx --yes serve@14 -l 4321 .",
+    "start": "npx --yes serve@14 -l 4321 .",
+    "build": "echo 'static site — no build step required'"
+  },
+  "license": "UNLICENSED"
+}
