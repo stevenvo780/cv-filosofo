@@ -72,6 +72,12 @@ body.en [data-lang-en] { display: revert; }
   height: 64px; gap: 16px;
 }
 .brand {
+  display: flex; flex-direction: row; align-items: center; gap: 12px; line-height: 1.1;
+}
+.brand-logo {
+  flex: 0 0 auto; width: 38px; height: 38px; display: block;
+}
+.brand-text {
   display: flex; flex-direction: column; line-height: 1.1;
 }
 .brand .name { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; letter-spacing: .3px; color: var(--crema); }
@@ -135,7 +141,7 @@ body.en [data-lang-en] { display: revert; }
   border: 1px solid transparent; cursor: pointer; transition: all .18s ease;
 }
 .btn-primary { background: var(--teal); color: #06100f; }
-.btn-primary:hover { background: #54c7b8; color: #06100f; transform: translateY(-1px); }
+.btn-primary:hover { background: #6fd3c4; color: #06100f; transform: translateY(-1px); }
 .btn-gold { background: var(--dorado); color: #1c1206; }
 .btn-gold:hover { background: #ecb872; color: #1c1206; transform: translateY(-1px); }
 .btn-ghost { background: transparent; border-color: var(--line-strong); color: var(--crema); }
