@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cv-filosofo.vercel.app/sitemap.xml
+Sitemap: https://filosofo.stevenvallejo.com/sitemap.xml
