@@ -7,19 +7,20 @@
 
 :root {
   --bg: #0b1417;
-  --bg-soft: #0f1c20;
-  --bg-card: #11211f;
-  --bg-card-2: #122522;
-  --crema: #f3ece0;
-  --crema-dim: #cdc6ba;
-  --crema-faint: #9aa39e;
+  --surface: #152028;
+  --bg-card: #131e22;
+  --bg-card-2: #152028;
+  --crema: #e8e0d4;
+  --crema-dim: #d4ccc0;
+  --crema-faint: #8fa3a8;
   --teal: #43b5a6;
   --teal-soft: rgba(67, 181, 166, 0.12);
   --teal-line: rgba(67, 181, 166, 0.28);
   --dorado: #e0a85e;
   --dorado-soft: rgba(224, 168, 94, 0.12);
-  --line: rgba(243, 236, 224, 0.10);
-  --line-strong: rgba(243, 236, 224, 0.18);
+  --acento-3: #c0522a;
+  --line: rgba(232, 224, 212, 0.10);
+  --line-strong: rgba(232, 224, 212, 0.18);
   --r-16: 16px;
   --r-22: 22px;
   --r-28: 28px;
@@ -38,14 +39,13 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--crema);
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background-image:
-    radial-gradient(1200px 600px at 80% -10%, rgba(67, 181, 166, 0.08), transparent 60%),
-    radial-gradient(900px 500px at 0% 10%, rgba(224, 168, 94, 0.06), transparent 55%);
+    radial-gradient(ellipse at 20% 50%, #1c1408 0%, #0b1417 60%);
   background-attachment: fixed;
 }
 

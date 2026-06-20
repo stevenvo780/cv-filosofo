@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://filosofo.stevenvallejo.com/sitemap.xml
+Host: https://filosofo.stevenvallejo.com
