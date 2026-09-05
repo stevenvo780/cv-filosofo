@@ -57,9 +57,8 @@ img { max-width: 100%; display: block; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 
 /* ---------- language toggle ---------- */
-[data-lang-en] { display: none; }
-body.en [data-lang-es] { display: none; }
-body.en [data-lang-en] { display: revert; }
+/* Language visibility must win over later .btn/.kicker display rules. */
+body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important; }
 
 /* ---------- header / nav ---------- */
 .topbar {

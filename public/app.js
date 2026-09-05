@@ -18,14 +18,13 @@
   }
 
   function initialLang() {
+    var requested = new URLSearchParams(window.location.search).get("lang");
+    if (requested === "es" || requested === "en") return requested;
+    if (/\/en(\/|$|\.html)/.test(window.location.pathname)) return "en";
     try {
       var saved = localStorage.getItem("cv-filo-lang");
       if (saved === "en" || saved === "es") return saved;
     } catch (e) {}
-    // honor ?lang=en and /en, otherwise default ES
-    var qs = new URLSearchParams(window.location.search);
-    if (qs.get("lang") === "en") return "en";
-    if (/\/en(\/|$|\.html)/.test(window.location.pathname)) return "en";
     return "es";
   }
 
