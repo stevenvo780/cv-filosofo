@@ -89,7 +89,17 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script>
+  /* Marca JS temprano (estados iniciales de los revelados) y decide si mostrar el preloader. */
+  (function (d) {
+    var h = d.documentElement; h.classList.add("js");
+    try {
+      var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!rm && !sessionStorage.getItem("filo-intro")) h.classList.add("intro-pending");
+    } catch (e) {}
+  })(document);
+</script>
 <link rel="stylesheet" href="styles.css" />
 
 <!-- JSON-LD — datos estructurados (5 scripts + 1 graph) -->
@@ -320,103 +330,192 @@
 </script>
 </head>
 <body>
+<a class="skip-link" href="#main"><span data-lang-es>Saltar al contenido</span><span data-lang-en>Skip to content</span></a>
 
-<!-- ================= TOPBAR ================= -->
-<header class="topbar">
-  <div class="wrap">
-    <div class="brand">
-      <a href="https://www.stevenvallejo.com" class="brand-wordmark" aria-label="Mouseîon — Steven Vallejo">
-        <img src="isotipo.png" alt="Lemniscata Mouseîon" class="brand-logo" width="26" height="26" />
-        <div class="brand-text">
-          <span class="name">Steven Vallejo</span>
-          <span class="ecosistema">Mouseîon</span>
-        </div>
-      </a>
-      <span class="brand-sep" aria-hidden="true">·</span>
-      <div class="brand-text brand-cv">
-        <span class="role" data-lang-es>CV filósofo</span>
-        <span class="role" data-lang-en>Philosophy CV</span>
-      </div>
+<!-- ================= PRELOADER (solo 1.ª visita de la sesión, con JS) ================= -->
+<div class="preloader" aria-hidden="true">
+  <div class="preloader-inner">
+    <div class="preloader-kicker">Mouseîon · <span data-lang-es>CV filósofo</span><span data-lang-en>Philosophy CV</span></div>
+    <div class="preloader-word" lang="grc">φιλόσοφος</div>
+    <div class="preloader-meta">
+      <span>Medellín · Universidad de Antioquia</span>
+      <span class="preloader-count" id="pl-count">00</span>
     </div>
-    <nav class="nav">
-      <div class="links">
-        <a href="#perfil" data-lang-es>Perfil</a><a href="#perfil" data-lang-en>Profile</a>
-        <a href="#areas" data-lang-es>Áreas</a><a href="#areas" data-lang-en>Areas</a>
-        <a href="#st" data-lang-es>ST</a><a href="#st" data-lang-en>ST</a>
-        <a href="#blog" data-lang-es>Blog</a><a href="#blog" data-lang-en>Blog</a>
-        <a href="#obra" data-lang-es>Obra</a><a href="#obra" data-lang-en>Work</a>
-        <a href="#contacto" data-lang-es>Contacto</a><a href="#contacto" data-lang-en>Contact</a>
-      </div>
-      <div class="lang-toggle" role="group" aria-label="Idioma / Language">
-        <button id="btn-es" class="active" aria-pressed="true">ES</button>
-        <button id="btn-en" aria-pressed="false">EN</button>
-      </div>
+    <div class="preloader-bar"><span id="pl-bar"></span></div>
+  </div>
+</div>
+
+<!-- ================= CAPAS DE FONDO ================= -->
+<div class="scroll-progress" id="progress" aria-hidden="true"></div>
+<div class="bg-nebula" aria-hidden="true"></div>
+<canvas id="ideas" class="ideas" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"></span></div>
+
+<!-- ================= CABECERA (siempre visible: secciones + ecosistema + WhatsApp) ================= -->
+<header class="site-header" id="header">
+  <div class="site-header-inner">
+    <a href="https://www.stevenvallejo.com" class="brand" aria-label="Mouseîon — Steven Vallejo">
+      <img src="isotipo.png" alt="Lemniscata Mouseîon" class="brand-logo" width="34" height="34" />
+      <span class="brand-word">
+        <span class="brand-name">Steven Vallejo</span>
+        <span class="brand-tag">Mouseîon · <span data-lang-es>CV filósofo</span><span data-lang-en>Philosophy CV</span></span>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="Secciones / Sections">
+      <a href="#perfil" class="nl"><span class="nl-label" data-text="Perfil" data-lang-es>Perfil</span><span class="nl-label" data-text="Profile" data-lang-en>Profile</span></a>
+      <a href="#areas" class="nl"><span class="nl-label" data-text="Áreas" data-lang-es>Áreas</span><span class="nl-label" data-text="Areas" data-lang-en>Areas</span></a>
+      <a href="#st" class="nl"><span class="nl-label" data-text="ST">ST</span></a>
+      <a href="#blog" class="nl"><span class="nl-label" data-text="Blog">Blog</span></a>
+      <a href="#obra" class="nl"><span class="nl-label" data-text="Obra" data-lang-es>Obra</span><span class="nl-label" data-text="Work" data-lang-en>Work</span></a>
+      <a href="#contacto" class="nl"><span class="nl-label" data-text="Contacto" data-lang-es>Contacto</span><span class="nl-label" data-text="Contact" data-lang-en>Contact</span></a>
     </nav>
+
+    <nav class="eco-nav" aria-label="Ecosistema Mouseîon">
+      <a href="https://www.stevenvallejo.com" class="eco-link"><span data-lang-es>Inicio</span><span data-lang-en>Home</span></a>
+      <a href="https://informatico.stevenvallejo.com" class="eco-link"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span></a>
+      <a href="https://schole.stevenvallejo.com" class="eco-link">Blog Scholḗ</a>
+      <a href="https://praxis.stevenvallejo.com" class="eco-link"><span data-lang-es>Servicios</span><span data-lang-en>Services</span></a>
+    </nav>
+
+    <a class="wa-btn" href="https://wa.me/573046374368" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.27-.2-.57-.35zM12.05 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.88 9.88zm8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.49-8.41z"/></svg>
+      <span class="wa-label">WhatsApp</span>
+    </a>
+
+    <div class="lang-toggle" role="group" aria-label="Idioma / Language">
+      <button type="button" data-set-lang="es" aria-pressed="true">ES</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="menu">
+      <span class="menu-btn-text"><span data-lang-es>Índice</span><span data-lang-en>Index</span></span>
+      <span class="menu-btn-icon" aria-hidden="true"><i></i><i></i></span>
+    </button>
   </div>
 </header>
 
+<!-- ================= MENÚ (índice + ecosistema) ================= -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Índice / Index" data-open="false" inert>
+  <div class="menu-inner">
+    <nav class="menu-sections" aria-label="Secciones / Sections">
+      <p class="menu-kicker"><span data-lang-es>Índice</span><span data-lang-en>Index</span></p>
+      <ol>
+        <li><a href="#prologo"><span class="mn">I</span><span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></a></li>
+        <li><a href="#perfil"><span class="mn">II</span><span data-lang-es>Perfil</span><span data-lang-en>Profile</span></a></li>
+        <li><a href="#areas"><span class="mn">III</span><span data-lang-es>Áreas</span><span data-lang-en>Areas</span></a></li>
+        <li><a href="#temas"><span class="mn">IV</span><span data-lang-es>Temas</span><span data-lang-en>Themes</span></a></li>
+        <li><a href="#st"><span class="mn">V</span>ST</a></li>
+        <li><a href="#influencias"><span class="mn">VI</span><span data-lang-es>Influencias</span><span data-lang-en>Influences</span></a></li>
+        <li><a href="#blog"><span class="mn">VII</span>Blog</a></li>
+        <li><a href="#formacion"><span class="mn">VIII</span><span data-lang-es>Formación</span><span data-lang-en>Education</span></a></li>
+        <li><a href="#competencias"><span class="mn">IX</span><span data-lang-es>Competencias</span><span data-lang-en>Competencies</span></a></li>
+        <li><a href="#obra"><span class="mn">X</span><span data-lang-es>Obra</span><span data-lang-en>Work</span></a></li>
+        <li><a href="#contacto"><span class="mn">XI</span><span data-lang-es>Contacto</span><span data-lang-en>Contact</span></a></li>
+      </ol>
+    </nav>
+    <div class="menu-side">
+      <p class="menu-kicker">Mouseîon</p>
+      <ul class="menu-eco">
+        <li><a href="https://www.stevenvallejo.com"><span data-lang-es>Inicio</span><span data-lang-en>Home</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://informatico.stevenvallejo.com"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://schole.stevenvallejo.com">Blog Scholḗ <span class="arr">↗</span></a></li>
+        <li><a href="https://praxis.stevenvallejo.com"><span>Praxis · <span data-lang-es>Servicios</span><span data-lang-en>Services</span></span> <span class="arr">↗</span></a></li>
+        <li><a href="https://wa.me/573046374368" target="_blank" rel="noopener">WhatsApp <span class="arr">↗</span></a></li>
+        <li><a href="mailto:stevenvallejo780@gmail.com">Email <span class="arr">↗</span></a></li>
+      </ul>
+      <div class="menu-foot">
+        <div class="lang-toggle lang-toggle-lg" role="group" aria-label="Idioma / Language">
+          <button type="button" data-set-lang="es" aria-pressed="true">Español</button>
+          <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+        </div>
+        <a class="menu-pdf" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
+        <a class="menu-pdf" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+
 <!-- ================= HERO ================= -->
-<section class="hero">
-  <div class="wrap">
-    <span class="kicker" data-lang-es>Filósofo · Lógica formal · Universidad de Antioquia</span>
-    <span class="kicker" data-lang-en>Philosopher · Formal logic · Universidad de Antioquia</span>
-
-    <h1 data-lang-es>Steven <span class="accent">Vallejo</span> Ortiz</h1>
-    <h1 data-lang-en>Steven <span class="accent">Vallejo</span> Ortiz</h1>
-
-    <p class="subtitle" data-lang-es>Pensar antes de construir.</p>
-    <p class="subtitle" data-lang-en>Think before you build.</p>
-
-    <p class="lead" data-lang-es>
-      Filósofo de formación analítica, formándome en la Universidad de Antioquia. Trabajo en
-      lógica formal y simbólica, epistemología, filosofía de la mente y de la inteligencia
-      artificial, y ética. Mi pregunta de fondo es antigua y precisa: qué es comprender, y
-      dónde termina el cálculo y empieza el sentido. No estudio la lógica solo para conocerla:
-      la escribo hasta hacerla correr en una máquina.
-    </p>
-    <p class="lead" data-lang-en>
-      Philosopher of analytic training, studying at the Universidad de Antioquia. I work in
-      formal and symbolic logic, epistemology, philosophy of mind and of artificial
-      intelligence, and ethics. My underlying question is old and precise: what it means to
-      understand, and where computation ends and meaning begins. I do not study logic only to
-      know it — I write it until it runs on a machine.
-    </p>
-
-    <blockquote class="epigraph" data-lang-es>
-      «La abstracción no es alejarse del problema. Es verlo desde la altura exacta.»
-    </blockquote>
-    <blockquote class="epigraph" data-lang-en>
-      "Abstraction is not stepping away from the problem. It is seeing it from exactly the right height."
-    </blockquote>
-
-    <div class="hero-meta">
-      <span><span class="dot">◆</span> Medellín, Antioquia, Colombia · GMT-5</span>
-      <span><span class="dot">◆</span> <span data-lang-es>Español (nativo) · Inglés (lectura/escritura)</span><span data-lang-en>Spanish (native) · English (reading/writing)</span></span>
+<section class="hero" data-scene="hero">
+  <div class="hero-inner">
+    <div class="hero-top" data-reveal="fade">
+      <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span><span data-lang-es>Filósofo · Lógica formal · Universidad de Antioquia</span><span data-lang-en>Philosopher · Formal logic · Universidad de Antioquia</span></span>
+      <span class="hero-greek" lang="grc" aria-hidden="true">φιλόσοφος</span>
     </div>
 
-    <div class="btn-row">
-      <a class="btn btn-primary" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
-      <a class="btn btn-primary" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
-      <a class="btn btn-gold" href="pdf/CV_filo_en.pdf" download data-lang-es>Descargar CV (PDF · EN)</a>
-      <a class="btn btn-gold" href="pdf/CV_filo_es.pdf" download data-lang-en>Download CV (PDF · ES)</a>
-      <a class="btn btn-ghost" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-es>Blog «Scholḗ»</a>
-      <a class="btn btn-ghost" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-en>Blog "Scholḗ"</a>
+    <h1 class="hero-title" data-split data-lang-es><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
+    <h1 class="hero-title" data-split data-lang-en><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
+
+    <div class="hero-sub">
+      <p class="hero-kicker" data-reveal="up" data-lang-es>Pensar antes de construir.</p>
+      <p class="hero-kicker" data-reveal="up" data-lang-en>Think before you build.</p>
+
+      <blockquote class="hero-epigraph" data-reveal="up" style="--d:120ms" data-lang-es>
+        «La abstracción no es alejarse del problema. Es verlo desde la altura exacta.»
+      </blockquote>
+      <blockquote class="hero-epigraph" data-reveal="up" style="--d:120ms" data-lang-en>
+        "Abstraction is not stepping away from the problem. It is seeing it from exactly the right height."
+      </blockquote>
+
+      <div class="hero-actions" data-reveal="up" style="--d:220ms">
+        <a class="btn-pill magnetic" href="pdf/CV_filo_es.pdf" download data-lang-es><span class="btn-pill-fill"></span>Descargar CV (PDF · ES)<span class="btn-pill-arrow" aria-hidden="true">↓</span></a>
+        <a class="btn-pill magnetic" href="pdf/CV_filo_en.pdf" download data-lang-en><span class="btn-pill-fill"></span>Download CV (PDF · EN)<span class="btn-pill-arrow" aria-hidden="true">↓</span></a>
+        <a class="btn-line" href="pdf/CV_filo_en.pdf" download data-lang-es>Descargar CV (PDF · EN)</a>
+        <a class="btn-line" href="pdf/CV_filo_es.pdf" download data-lang-en>Download CV (PDF · ES)</a>
+        <a class="btn-line" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-es>Blog «Scholḗ» <span aria-hidden="true">↗</span></a>
+        <a class="btn-line" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-en>Blog "Scholḗ" <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+
+    <div class="hero-foot" data-reveal="fade" style="--d:320ms">
+      <span class="hero-meta"><span class="dot" aria-hidden="true">◆</span> Medellín, Antioquia, Colombia · GMT-5</span>
+      <span class="hero-scroll" aria-hidden="true"><span class="hero-scroll-line"></span><span data-lang-es>Desplaza</span><span data-lang-en>Scroll</span></span>
+      <span class="hero-meta hero-meta-r"><span class="dot" aria-hidden="true">◆</span> <span data-lang-es>Español (nativo) · Inglés (lectura/escritura)</span><span data-lang-en>Spanish (native) · English (reading/writing)</span></span>
     </div>
   </div>
 </section>
 
-<!-- ================= PERFIL ================= -->
-<section class="block" id="perfil">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>El método</div>
-      <div class="eyebrow" data-lang-en>The method</div>
-      <h2 data-lang-es>Abstracción</h2>
-      <h2 data-lang-en>Abstraction</h2>
-    </div>
-    <div class="grid grid-2">
-      <div class="card">
-        <p data-lang-es>
+<!-- ================= § I PRÓLOGO ================= -->
+<section class="section manifesto" id="prologo" data-scene="prologo">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ I</span> <span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></p>
+    <p class="mf-text" data-words data-lang-es>
+      Filósofo de formación analítica, formándome en la Universidad de Antioquia. Trabajo en
+      <em>lógica formal y simbólica, epistemología, filosofía de la mente y de la inteligencia
+      artificial, y ética.</em> Mi pregunta de fondo es antigua y precisa: <em>qué es comprender, y
+      dónde termina el cálculo y empieza el sentido.</em> No estudio la lógica solo para conocerla:
+      la escribo hasta hacerla correr en una máquina.
+    </p>
+    <p class="mf-text" data-words data-lang-en>
+      Philosopher of analytic training, studying at the Universidad de Antioquia. I work in
+      <em>formal and symbolic logic, epistemology, philosophy of mind and of artificial
+      intelligence, and ethics.</em> My underlying question is old and precise: <em>what it means to
+      understand, and where computation ends and meaning begins.</em> I do not study logic only to
+      know it — I write it until it runs on a machine.
+    </p>
+    <dl class="mf-stats" data-reveal="up">
+      <div class="mf-stat"><dt data-lang-es>Áreas</dt><dt data-lang-en>Areas</dt><dd class="count" data-count-of="#areas .area-panel">4</dd></div>
+      <div class="mf-stat"><dt data-lang-es>Temas intelectuales</dt><dt data-lang-en>Intellectual themes</dt><dd class="count" data-count-of="#temas .theme-card">7</dd></div>
+      <div class="mf-stat"><dt data-lang-es>Proyectos</dt><dt data-lang-en>Projects</dt><dd class="count" data-count-of="#obra .proj">30</dd></div>
+      <div class="mf-stat"><dt data-lang-es>Escritos</dt><dt data-lang-en>Writings</dt><dd class="count" data-count-of="#blog .idx-row, #blog .essay">14</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ================= § II PERFIL / EL MÉTODO ================= -->
+<section class="section method" id="perfil" data-scene="perfil">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ II</span> <span data-lang-es>El método</span><span data-lang-en>The method</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Abstracción</h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>Abstraction</h2>
+
+    <div class="method-grid">
+      <article class="method-col" data-reveal="up">
+        <p class="dropcap" data-lang-es>
           La filosofía me dio el método antes que cualquier técnica: definir bien el problema
           antes de escribir una sola línea. Casi siempre, lo que llamamos un problema difícil
           es un problema mal planteado. La abstracción es la herramienta para verlo con
@@ -424,7 +523,7 @@
           pierde lo concreto—, sino desde la altura exacta en que el problema por fin se deja
           mirar entero.
         </p>
-        <p data-lang-en>
+        <p class="dropcap" data-lang-en>
           Philosophy gave me a method before any technique: define the problem well before
           writing a single line. Almost always, what we call a hard problem is a badly posed
           one. Abstraction is the tool for seeing it clearly — neither too close, where detail
@@ -433,8 +532,8 @@
         </p>
         <div class="q" data-lang-es>¿Cuánto de lo que llamamos un problema técnico es, en realidad, un problema mal planteado?</div>
         <div class="q" data-lang-en>How much of what we call a technical problem is, in fact, a badly posed one?</div>
-      </div>
-      <div class="card">
+      </article>
+      <article class="method-col" data-reveal="up" style="--d:140ms">
         <div class="kicker-sm" data-lang-es>La obra · La cueva</div>
         <div class="kicker-sm" data-lang-en>The work · The cave</div>
         <h3 data-lang-es>Construir para entender</h3>
@@ -455,207 +554,240 @@
         </p>
         <div class="q" data-lang-es>¿Qué se construye cuando dejas de construir para otros y empiezas a construir para entender?</div>
         <div class="q" data-lang-en>What do you build when you stop building for others and start building to understand?</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= § III ÁREAS (sección fija en escritorio) ================= -->
+<section class="areas" id="areas" data-scene="areas" style="--steps:4">
+  <div class="areas-sticky">
+    <div class="areas-head">
+      <p class="section-label" data-reveal="up"><span class="section-num">§ III</span> <span data-lang-es>Trabajo filosófico</span><span data-lang-en>Philosophical work</span></p>
+      <h2 class="areas-title" data-reveal="up" data-lang-es>Áreas</h2>
+      <h2 class="areas-title" data-reveal="up" data-lang-en>Areas</h2>
+    </div>
+
+    <ol class="areas-rail" aria-hidden="true">
+      <li><button type="button" class="areas-rail-item" data-step="0" tabindex="-1" style="--c:var(--gold)"><span>01</span> <span data-lang-es>Lógica</span><span data-lang-en>Logic</span></button></li>
+      <li><button type="button" class="areas-rail-item" data-step="1" tabindex="-1" style="--c:var(--teal)"><span>02</span> <span data-lang-es>Epistemología</span><span data-lang-en>Epistemology</span></button></li>
+      <li><button type="button" class="areas-rail-item" data-step="2" tabindex="-1" style="--c:var(--violet)"><span>03</span> <span data-lang-es>Mente e IA</span><span data-lang-en>Mind &amp; AI</span></button></li>
+      <li><button type="button" class="areas-rail-item" data-step="3" tabindex="-1" style="--c:var(--terracotta-soft)"><span>04</span> <span data-lang-es>Ética</span><span data-lang-en>Ethics</span></button></li>
+    </ol>
+
+    <div class="areas-panels">
+      <article class="area-panel" data-i="0" style="--c:var(--gold)">
+        <div class="area-meta"><span>01 / 04</span><span lang="grc-Latn">lógos</span></div>
+        <p class="area-greek" lang="grc" aria-hidden="true">λόγος</p>
+        <h3 data-lang-es>Lógica formal y simbólica</h3>
+        <h3 data-lang-en>Formal and symbolic logic</h3>
+        <p data-lang-es>Cálculo proposicional y de predicados, sistemas de prueba y semántica. Es el eje central de mi formación y de mi trabajo.</p>
+        <p data-lang-en>Propositional and predicate calculus, proof systems and semantics. The central axis of my training and of my work.</p>
+      </article>
+      <article class="area-panel" data-i="1" style="--c:var(--teal)">
+        <div class="area-meta"><span>02 / 04</span><span lang="grc-Latn">epistḗmē</span></div>
+        <p class="area-greek" lang="grc" aria-hidden="true">ἐπιστήμη</p>
+        <h3 data-lang-es>Filosofía analítica y epistemología</h3>
+        <h3 data-lang-en>Analytic philosophy and epistemology</h3>
+        <p data-lang-es>Análisis del lenguaje y del argumento; las condiciones del conocimiento, la justificación y la verdad. Claridad y precisión por encima de la retórica vacía.</p>
+        <p data-lang-en>Analysis of language and argument; the conditions of knowledge, justification and truth. Clarity and precision above empty rhetoric.</p>
+      </article>
+      <article class="area-panel" data-i="2" style="--c:var(--violet)">
+        <div class="area-meta"><span>03 / 04</span><span lang="grc-Latn">noûs</span></div>
+        <p class="area-greek" lang="grc" aria-hidden="true">νοῦς</p>
+        <h3 data-lang-es>Filosofía de la mente y de la IA</h3>
+        <h3 data-lang-en>Philosophy of mind and of AI</h3>
+        <p data-lang-es>Qué es comprender, qué hace una máquina cuando «razona», y dónde están los límites entre cómputo y sentido.</p>
+        <p data-lang-en>What it means to understand, what a machine does when it "reasons", and where the limits between computation and meaning lie.</p>
+      </article>
+      <article class="area-panel" data-i="3" style="--c:var(--terracotta-soft)">
+        <div class="area-meta"><span>04 / 04</span><span lang="grc-Latn">êthos</span></div>
+        <p class="area-greek" lang="grc" aria-hidden="true">ἦθος</p>
+        <h3 data-lang-es>Ética, argumentación y retórica</h3>
+        <h3 data-lang-en>Ethics, argumentation and rhetoric</h3>
+        <p data-lang-es>Razón práctica, decisión y diálogo. El <em>Gorgias</em> como brújula: la diferencia entre persuadir y mostrar lo verdadero.</p>
+        <p data-lang-en>Practical reason, decision and dialogue. The <em>Gorgias</em> as compass: the difference between persuading and showing what is true.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= § IV TEMAS (carril horizontal) ================= -->
+<section class="rail-sec" id="temas" data-scene="temas">
+  <div class="rail-pin">
+    <div class="container rail-head">
+      <div>
+        <p class="section-label" data-reveal="up"><span class="section-num">§ IV</span> <span data-lang-es>El programa</span><span data-lang-en>The program</span></p>
+        <h2 class="section-title section-title-md" data-reveal="up" data-lang-es>Siete temas <em>intelectuales</em></h2>
+        <h2 class="section-title section-title-md" data-reveal="up" data-lang-en>Seven intellectual <em>themes</em></h2>
+      </div>
+      <div class="rail-aside" data-reveal="up">
+        <p class="intro" data-lang-es>No son teorías sueltas: son los hilos que recorren mi escritura y mis proyectos.</p>
+        <p class="intro" data-lang-en>Not loose theories: they are the threads running through my writing and my projects.</p>
+        <div class="rail-progress" aria-hidden="true"><span id="rail-bar"></span></div>
+      </div>
+    </div>
+    <div class="rail-viewport">
+      <div class="rail-track" id="rail-track">
+        <article class="theme-card"><span class="theme-num">01</span>
+          <h3 data-lang-es>Lógica formal ejecutable</h3><h3 data-lang-en>Executable formal logic</h3>
+          <p data-lang-es>No estudiar la lógica, implementarla. Si la lógica formal puede correr en una máquina, ¿qué dice eso sobre el pensamiento?</p>
+          <p data-lang-en>Not studying logic, implementing it. If formal logic can run on a machine, what does that say about thought?</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">02</span>
+          <h3 data-lang-es>Filosofía de la IA y de la mente como un solo problema</h3><h3 data-lang-en>Philosophy of AI and of mind as one problem</h3>
+          <p data-lang-es>El agente que ejecuta frente al chatbot que conversa; el criterio que ninguna máquina fabrica. Multiplica fuerza, no fabrica criterio.</p>
+          <p data-lang-en>The agent that executes versus the chatbot that converses; the judgment no machine manufactures. It multiplies force, it does not manufacture judgment.</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">03</span>
+          <h3 data-lang-es>Abstracción como método y virtud</h3><h3 data-lang-en>Abstraction as method and virtue</h3>
+          <p data-lang-es>La abstracción no es alejarse del problema; es verlo desde la altura exacta.</p>
+          <p data-lang-en>Abstraction is not stepping away from the problem; it is seeing it from exactly the right height.</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">04</span>
+          <h3 data-lang-es>El <em>Gorgias</em>: la retórica como filosofía práctica</h3><h3 data-lang-en>The <em>Gorgias</em>: rhetoric as practical philosophy</h3>
+          <p data-lang-es>La palabra que hace pensar frente a la que solo quiere ganar. ¿De qué sirve convencer si no se sabe mostrar lo verdadero?</p>
+          <p data-lang-en>The word that makes one think versus the one that only wants to win. What use is convincing if one cannot show what is true?</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">05</span>
+          <h3 data-lang-es>Emergencia y sistemas complejos</h3><h3 data-lang-en>Emergence and complex systems</h3>
+          <p data-lang-es>De Maturana y Varela a Luhmann y a los sistemas multiagente; la economía como sistema complejo.</p>
+          <p data-lang-en>From Maturana and Varela to Luhmann and multi-agent systems; the economy as a complex system.</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">06</span>
+          <h3 data-lang-es>Epistemología aplicada</h3><h3 data-lang-en>Applied epistemology</h3>
+          <p data-lang-es>Cuándo algo cuenta como conocimiento. Si no puedes operacionalizar un concepto, no generas conocimiento verificable.</p>
+          <p data-lang-en>When something counts as knowledge. If you cannot operationalize a concept, you do not produce verifiable knowledge.</p>
+        </article>
+        <article class="theme-card"><span class="theme-num">07</span>
+          <h3 data-lang-es>La arquitectura como postura ontológica</h3><h3 data-lang-en>Architecture as an ontological stance</h3>
+          <p data-lang-es>CQRS, microservicios, observabilidad: no como meros trade-offs técnicos, sino como compromisos ontológicos sobre cómo se separa y se revela la intención.</p>
+          <p data-lang-en>CQRS, microservices, observability: not as mere technical trade-offs, but as ontological commitments about how intention is separated and revealed.</p>
+        </article>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= ÁREAS ================= -->
-<section class="block" id="areas">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Trabajo filosófico</div>
-      <div class="eyebrow" data-lang-en>Philosophical work</div>
-      <h2 data-lang-es>Áreas</h2>
-      <h2 data-lang-en>Areas</h2>
-    </div>
-    <div class="grid grid-2">
-      <div class="card area">
-        <div class="marker"></div>
-        <div>
-          <h3 data-lang-es>Lógica formal y simbólica</h3>
-          <h3 data-lang-en>Formal and symbolic logic</h3>
-          <p data-lang-es>Cálculo proposicional y de predicados, sistemas de prueba y semántica. Es el eje central de mi formación y de mi trabajo.</p>
-          <p data-lang-en>Propositional and predicate calculus, proof systems and semantics. The central axis of my training and of my work.</p>
-        </div>
-      </div>
-      <div class="card area">
-        <div class="marker"></div>
-        <div>
-          <h3 data-lang-es>Filosofía analítica y epistemología</h3>
-          <h3 data-lang-en>Analytic philosophy and epistemology</h3>
-          <p data-lang-es>Análisis del lenguaje y del argumento; las condiciones del conocimiento, la justificación y la verdad. Claridad y precisión por encima de la retórica vacía.</p>
-          <p data-lang-en>Analysis of language and argument; the conditions of knowledge, justification and truth. Clarity and precision above empty rhetoric.</p>
-        </div>
-      </div>
-      <div class="card area">
-        <div class="marker"></div>
-        <div>
-          <h3 data-lang-es>Filosofía de la mente y de la IA</h3>
-          <h3 data-lang-en>Philosophy of mind and of AI</h3>
-          <p data-lang-es>Qué es comprender, qué hace una máquina cuando «razona», y dónde están los límites entre cómputo y sentido.</p>
-          <p data-lang-en>What it means to understand, what a machine does when it "reasons", and where the limits between computation and meaning lie.</p>
-        </div>
-      </div>
-      <div class="card area">
-        <div class="marker"></div>
-        <div>
-          <h3 data-lang-es>Ética, argumentación y retórica</h3>
-          <h3 data-lang-en>Ethics, argumentation and rhetoric</h3>
-          <p data-lang-es>Razón práctica, decisión y diálogo. El <em>Gorgias</em> como brújula: la diferencia entre persuadir y mostrar lo verdadero.</p>
-          <p data-lang-en>Practical reason, decision and dialogue. The <em>Gorgias</em> as compass: the difference between persuading and showing what is true.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- ================= CINTA DE VOCABULARIO ================= -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-row"><div class="marquee-track" data-dir="-1">
+    <span class="marquee-item"><span class="mq-greek">λόγος</span><span class="mq-star">✦</span><span class="mq-latin">ratio</span><span class="mq-star">✦</span><span class="mq-greek">ἐπιστήμη</span><span class="mq-star">✦</span><span class="mq-latin">scientia</span><span class="mq-star">✦</span><span class="mq-greek">νοῦς</span><span class="mq-star">✦</span><span class="mq-latin">mens</span><span class="mq-star">✦</span></span>
+    <span class="marquee-item"><span class="mq-greek">λόγος</span><span class="mq-star">✦</span><span class="mq-latin">ratio</span><span class="mq-star">✦</span><span class="mq-greek">ἐπιστήμη</span><span class="mq-star">✦</span><span class="mq-latin">scientia</span><span class="mq-star">✦</span><span class="mq-greek">νοῦς</span><span class="mq-star">✦</span><span class="mq-latin">mens</span><span class="mq-star">✦</span></span>
+  </div></div>
+  <div class="marquee-row"><div class="marquee-track" data-dir="1">
+    <span class="marquee-item"><span class="mq-latin">virtus</span><span class="mq-star">✦</span><span class="mq-greek">ἦθος</span><span class="mq-star">✦</span><span class="mq-latin">veritas</span><span class="mq-star">✦</span><span class="mq-greek">ἀλήθεια</span><span class="mq-star">✦</span><span class="mq-latin">systema</span><span class="mq-star">✦</span><span class="mq-greek">κόσμος</span><span class="mq-star">✦</span></span>
+    <span class="marquee-item"><span class="mq-latin">virtus</span><span class="mq-star">✦</span><span class="mq-greek">ἦθος</span><span class="mq-star">✦</span><span class="mq-latin">veritas</span><span class="mq-star">✦</span><span class="mq-greek">ἀλήθεια</span><span class="mq-star">✦</span><span class="mq-latin">systema</span><span class="mq-star">✦</span><span class="mq-greek">κόσμος</span><span class="mq-star">✦</span></span>
+  </div></div>
+</div>
 
-<!-- ================= TEMAS INTELECTUALES ================= -->
-<section class="block" id="temas">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>El programa</div>
-      <div class="eyebrow" data-lang-en>The program</div>
-      <h2 data-lang-es>Siete temas intelectuales</h2>
-      <h2 data-lang-en>Seven intellectual themes</h2>
-      <p class="intro" data-lang-es>No son teorías sueltas: son los hilos que recorren mi escritura y mis proyectos.</p>
-      <p class="intro" data-lang-en>Not loose theories: they are the threads running through my writing and my projects.</p>
-    </div>
-    <div class="grid grid-2">
-      <div class="card theme"><span class="num">1</span>
-        <h3 data-lang-es>Lógica formal ejecutable</h3><h3 data-lang-en>Executable formal logic</h3>
-        <p data-lang-es>No estudiar la lógica, implementarla. Si la lógica formal puede correr en una máquina, ¿qué dice eso sobre el pensamiento?</p>
-        <p data-lang-en>Not studying logic, implementing it. If formal logic can run on a machine, what does that say about thought?</p>
-      </div>
-      <div class="card theme"><span class="num">2</span>
-        <h3 data-lang-es>Filosofía de la IA y de la mente como un solo problema</h3><h3 data-lang-en>Philosophy of AI and of mind as one problem</h3>
-        <p data-lang-es>El agente que ejecuta frente al chatbot que conversa; el criterio que ninguna máquina fabrica. Multiplica fuerza, no fabrica criterio.</p>
-        <p data-lang-en>The agent that executes versus the chatbot that converses; the judgment no machine manufactures. It multiplies force, it does not manufacture judgment.</p>
-      </div>
-      <div class="card theme"><span class="num">3</span>
-        <h3 data-lang-es>Abstracción como método y virtud</h3><h3 data-lang-en>Abstraction as method and virtue</h3>
-        <p data-lang-es>La abstracción no es alejarse del problema; es verlo desde la altura exacta.</p>
-        <p data-lang-en>Abstraction is not stepping away from the problem; it is seeing it from exactly the right height.</p>
-      </div>
-      <div class="card theme"><span class="num">4</span>
-        <h3 data-lang-es>El <em>Gorgias</em>: la retórica como filosofía práctica</h3><h3 data-lang-en>The <em>Gorgias</em>: rhetoric as practical philosophy</h3>
-        <p data-lang-es>La palabra que hace pensar frente a la que solo quiere ganar. ¿De qué sirve convencer si no se sabe mostrar lo verdadero?</p>
-        <p data-lang-en>The word that makes one think versus the one that only wants to win. What use is convincing if one cannot show what is true?</p>
-      </div>
-      <div class="card theme"><span class="num">5</span>
-        <h3 data-lang-es>Emergencia y sistemas complejos</h3><h3 data-lang-en>Emergence and complex systems</h3>
-        <p data-lang-es>De Maturana y Varela a Luhmann y a los sistemas multiagente; la economía como sistema complejo.</p>
-        <p data-lang-en>From Maturana and Varela to Luhmann and multi-agent systems; the economy as a complex system.</p>
-      </div>
-      <div class="card theme"><span class="num">6</span>
-        <h3 data-lang-es>Epistemología aplicada</h3><h3 data-lang-en>Applied epistemology</h3>
-        <p data-lang-es>Cuándo algo cuenta como conocimiento. Si no puedes operacionalizar un concepto, no generas conocimiento verificable.</p>
-        <p data-lang-en>When something counts as knowledge. If you cannot operationalize a concept, you do not produce verifiable knowledge.</p>
-      </div>
-      <div class="card theme"><span class="num">7</span>
-        <h3 data-lang-es>La arquitectura como postura ontológica</h3><h3 data-lang-en>Architecture as an ontological stance</h3>
-        <p data-lang-es>CQRS, microservicios, observabilidad: no como meros trade-offs técnicos, sino como compromisos ontológicos sobre cómo se separa y se revela la intención.</p>
-        <p data-lang-en>CQRS, microservices, observability: not as mere technical trade-offs, but as ontological commitments about how intention is separated and revealed.</p>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- ================= § V ST — LÓGICA EJECUTABLE ================= -->
+<section class="section st" id="st" data-scene="st">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ V</span> <span data-lang-es>El puente filosofía–ingeniería</span><span data-lang-en>The philosophy–engineering bridge</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Cuando un argumento <em>se puede correr</em></h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>When an argument <em>can be run</em></h2>
 
-<!-- ================= ST — LÓGICA EJECUTABLE ================= -->
-<section class="block" id="st">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>El puente filosofía–ingeniería</div>
-      <div class="eyebrow" data-lang-en>The philosophy–engineering bridge</div>
-      <h2 data-lang-es>Cuando un argumento se puede correr</h2>
-      <h2 data-lang-en>When an argument can be run</h2>
-    </div>
-    <div class="feature">
-      <span class="tag" data-lang-es>ST · Lenguaje de lógica formal ejecutable</span>
-      <span class="tag" data-lang-en>ST · Executable formal-logic language</span>
-      <h3 data-lang-es>ST — la lógica formal hecha ejecutable</h3>
-      <h3 data-lang-en>ST — formal logic made executable</h3>
-      <p data-lang-es>
-        ST es un lenguaje de lógica formal ejecutable: un DSL con más de 30 perfiles lógicos,
-        un SAT solver propio (CDCL), teoría de tipos (MLTT) y más de 6.333 pruebas, bilingüe
-        ES/EN. Es la pieza más ambiciosa de mi obra y el cruce exacto entre la filosofía
-        analítica y la ingeniería: tomar un argumento, formalizarlo y dejar que la máquina lo
-        evalúe. Su complemento, <em>auto.logic</em>, convierte lenguaje natural en lógica
-        formal ejecutable sin IA, con NLP basado en reglas (11 perfiles lógicos, ~200
-        marcadores discursivos). El núcleo lógico de ST late dentro del agente Agora.
-      </p>
-      <p data-lang-en>
-        ST is an executable formal-logic language: a DSL with 30+ logic profiles, a custom SAT
-        solver (CDCL), type theory (MLTT) and 6,333+ tests, bilingual ES/EN. It is the most
-        ambitious piece of my work and the precise crossing of analytic philosophy and
-        engineering: take an argument, formalize it, and let the machine evaluate it. Its
-        companion, <em>auto.logic</em>, turns natural language into executable formal logic
-        with no AI, using rule-based NLP (11 logic profiles, ~200 discourse markers). The
-        logical core of ST runs inside the Agora agent.
-      </p>
-      <div class="meta-pills">
-        <span class="pill">SAT solver CDCL</span>
-        <span class="pill">Teoría de tipos · MLTT</span>
-        <span class="pill">30+ <span data-lang-es>perfiles lógicos</span><span data-lang-en>logic profiles</span></span>
-        <span class="pill">6.333+ tests</span>
-        <span class="pill gold">npm · @stevenvo780/st-lang</span>
-        <span class="pill gold">auto.logic · @stevenvo780/autologic</span>
+    <div class="st-grid">
+      <div class="st-copy" data-reveal="up">
+        <span class="tag" data-lang-es>ST · Lenguaje de lógica formal ejecutable</span>
+        <span class="tag" data-lang-en>ST · Executable formal-logic language</span>
+        <h3 data-lang-es>ST — la lógica formal hecha ejecutable</h3>
+        <h3 data-lang-en>ST — formal logic made executable</h3>
+        <p data-lang-es>
+          ST es un lenguaje de lógica formal ejecutable: un DSL con más de 30 perfiles lógicos,
+          un SAT solver propio (CDCL), teoría de tipos (MLTT) y más de 6.333 pruebas, bilingüe
+          ES/EN. Es la pieza más ambiciosa de mi obra y el cruce exacto entre la filosofía
+          analítica y la ingeniería: tomar un argumento, formalizarlo y dejar que la máquina lo
+          evalúe. Su complemento, <em>auto.logic</em>, convierte lenguaje natural en lógica
+          formal ejecutable sin IA, con NLP basado en reglas (11 perfiles lógicos, ~200
+          marcadores discursivos). El núcleo lógico de ST late dentro del agente Agora.
+        </p>
+        <p data-lang-en>
+          ST is an executable formal-logic language: a DSL with 30+ logic profiles, a custom SAT
+          solver (CDCL), type theory (MLTT) and 6,333+ tests, bilingual ES/EN. It is the most
+          ambitious piece of my work and the precise crossing of analytic philosophy and
+          engineering: take an argument, formalize it, and let the machine evaluate it. Its
+          companion, <em>auto.logic</em>, turns natural language into executable formal logic
+          with no AI, using rule-based NLP (11 logic profiles, ~200 discourse markers). The
+          logical core of ST runs inside the Agora agent.
+        </p>
+        <div class="meta-pills">
+          <span class="pill">SAT solver CDCL</span>
+          <span class="pill"><span data-lang-es>Teoría de tipos</span><span data-lang-en>Type theory</span> · MLTT</span>
+          <span class="pill">30+ <span data-lang-es>perfiles lógicos</span><span data-lang-en>logic profiles</span></span>
+          <span class="pill">6.333+ tests</span>
+          <span class="pill gold">npm · @stevenvo780/st-lang</span>
+          <span class="pill gold">auto.logic · @stevenvo780/autologic</span>
+        </div>
+        <div class="btn-row">
+          <a class="btn-line" href="https://github.com/stevenvo780/ST" target="_blank" rel="noopener">ST · GitHub <span aria-hidden="true">↗</span></a>
+          <a class="btn-line" href="https://github.com/stevenvo780/auto.logic" target="_blank" rel="noopener">auto.logic · GitHub <span aria-hidden="true">↗</span></a>
+        </div>
       </div>
-      <div class="btn-row">
-        <a class="btn btn-ghost" href="https://github.com/stevenvo780/ST" target="_blank" rel="noopener">ST · GitHub</a>
-        <a class="btn btn-ghost" href="https://github.com/stevenvo780/auto.logic" target="_blank" rel="noopener">auto.logic · GitHub</a>
+
+      <div class="st-side" data-reveal="up" style="--d:120ms">
+        <div class="proof" aria-hidden="true">
+          <div class="proof-prem"><span>p → q</span><span>p</span></div>
+          <div class="proof-line"><span class="proof-rule">→E</span></div>
+          <div class="proof-concl">q</div>
+          <div class="proof-caption">modus ponens · ⊢</div>
+        </div>
+        <dl class="st-stats">
+          <div class="st-stat"><dd><span class="count" data-to="30">30</span>+</dd><dt data-lang-es>perfiles lógicos</dt><dt data-lang-en>logic profiles</dt></div>
+          <div class="st-stat"><dd><span class="count" data-to="6333" data-sep="1">6.333</span>+</dd><dt>tests</dt></div>
+          <div class="st-stat"><dd>CDCL</dd><dt>SAT solver</dt></div>
+          <div class="st-stat"><dd>MLTT</dd><dt data-lang-es>teoría de tipos</dt><dt data-lang-en>type theory</dt></div>
+        </dl>
       </div>
     </div>
 
-    <div class="grid grid-3" style="margin-top:22px;">
-      <div class="card">
+    <div class="st-questions">
+      <div class="st-q" data-reveal="up">
         <div class="kicker-sm" data-lang-es>Lógica ejecutable</div><div class="kicker-sm" data-lang-en>Executable logic</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-es>¿Pensar es calcular, o calcular es apenas la sombra que el pensar proyecta sobre una máquina?</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-en>Is thinking calculating, or is calculating merely the shadow thinking casts upon a machine?</div>
+        <div class="q" data-lang-es>¿Pensar es calcular, o calcular es apenas la sombra que el pensar proyecta sobre una máquina?</div>
+        <div class="q" data-lang-en>Is thinking calculating, or is calculating merely the shadow thinking casts upon a machine?</div>
       </div>
-      <div class="card">
+      <div class="st-q" data-reveal="up" style="--d:100ms">
         <div class="kicker-sm" data-lang-es>Filosofía de la IA</div><div class="kicker-sm" data-lang-en>Philosophy of AI</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-es>¿Qué parte de nuestra inteligencia es justamente la que no podemos delegar?</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-en>Which part of our intelligence is precisely the part we cannot delegate?</div>
+        <div class="q" data-lang-es>¿Qué parte de nuestra inteligencia es justamente la que no podemos delegar?</div>
+        <div class="q" data-lang-en>Which part of our intelligence is precisely the part we cannot delegate?</div>
       </div>
-      <div class="card">
+      <div class="st-q" data-reveal="up" style="--d:200ms">
         <div class="kicker-sm" data-lang-es>El Gorgias</div><div class="kicker-sm" data-lang-en>The Gorgias</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-es>¿De qué sirve convencer si no se sabe mostrar lo verdadero?</div>
-        <div class="q" style="border:0;padding:0;margin:0;" data-lang-en>What use is convincing if one cannot show what is true?</div>
+        <div class="q" data-lang-es>¿De qué sirve convencer si no se sabe mostrar lo verdadero?</div>
+        <div class="q" data-lang-en>What use is convincing if one cannot show what is true?</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= INFLUENCIAS ================= -->
-<section class="block" id="influencias">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Linaje</div>
-      <div class="eyebrow" data-lang-en>Lineage</div>
-      <h2 data-lang-es>Influencias</h2>
-      <h2 data-lang-en>Influences</h2>
-    </div>
-    <div class="grid grid-2">
+<!-- ================= § VI INFLUENCIAS ================= -->
+<section class="section lineage" id="influencias" data-scene="linaje">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ VI</span> <span data-lang-es>Linaje</span><span data-lang-en>Lineage</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Influencias</h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>Influences</h2>
+    <div class="lineage-grid">
       <ul class="influence-list">
-        <li><strong data-lang-es>Platón — el <em>Gorgias</em></strong><strong data-lang-en>Plato — the <em>Gorgias</em></strong>
+        <li data-reveal="up"><span class="inf-n">i</span><strong data-lang-es>Platón — el <em>Gorgias</em></strong><strong data-lang-en>Plato — the <em>Gorgias</em></strong>
           <span data-lang-es>La retórica que hace pensar frente a la que solo quiere ganar; brújula ética y retórica.</span>
           <span data-lang-en>The rhetoric that makes one think versus the one that only wants to win; an ethical and rhetorical compass.</span></li>
-        <li><strong>Alain Badiou</strong>
+        <li data-reveal="up"><span class="inf-n">ii</span><strong>Alain Badiou</strong>
           <span data-lang-es>El evento como ruptura que redefine lo que cuenta como ser; la matemática (teoría de conjuntos) como ontología.</span>
           <span data-lang-en>The event as a rupture that redefines what counts as being; mathematics (set theory) as ontology.</span></li>
-        <li><strong>Jean-Paul Sartre</strong>
+        <li data-reveal="up"><span class="inf-n">iii</span><strong>Jean-Paul Sartre</strong>
           <span data-lang-es>Existencialismo: cada individuo es responsable de sus actos y ha de hallar sentido en su libertad.</span>
           <span data-lang-en>Existentialism: each individual is responsible for their acts and must find meaning in their freedom.</span></li>
       </ul>
       <ul class="influence-list">
-        <li><strong>Immanuel Kant</strong>
+        <li data-reveal="up"><span class="inf-n">iv</span><strong>Immanuel Kant</strong>
           <span data-lang-es>El juicio sintético a priori y las condiciones de posibilidad del conocimiento: qué puede saberse y cómo.</span>
           <span data-lang-en>The synthetic a priori and the conditions of possibility of knowledge: what can be known and how.</span></li>
-        <li><strong data-lang-es>Emergentismo — filosofía de la mente</strong><strong data-lang-en>Emergentism — philosophy of mind</strong>
+        <li data-reveal="up"><span class="inf-n">v</span><strong data-lang-es>Emergentismo — filosofía de la mente</strong><strong data-lang-en>Emergentism — philosophy of mind</strong>
           <span data-lang-es>Las propiedades mentales surgen de la complejidad del cerebro y no se reducen a sus partes.</span>
           <span data-lang-en>Mental properties arise from the brain's complexity and are not reducible to its parts.</span></li>
-        <li><strong data-lang-es>Maturana y Varela → Luhmann</strong><strong data-lang-en>Maturana and Varela → Luhmann</strong>
+        <li data-reveal="up"><span class="inf-n">vi</span><strong data-lang-es>Maturana y Varela → Luhmann</strong><strong data-lang-en>Maturana and Varela → Luhmann</strong>
           <span data-lang-es>Emergencia, autopoiesis y sistemas complejos como marco para pensar lo social y lo cognitivo.</span>
           <span data-lang-en>Emergence, autopoiesis and complex systems as a frame for thinking the social and the cognitive.</span></li>
       </ul>
@@ -663,173 +795,161 @@
   </div>
 </section>
 
-<!-- ================= BLOG ABSTRACCIÓN ================= -->
-<section class="block" id="blog">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Escritura</div>
-      <div class="eyebrow" data-lang-en>Writing</div>
-      <h2 data-lang-es>Blog «Scholḗ»</h2>
-      <h2 data-lang-en>The blog "Scholḗ"</h2>
-      <p class="intro" data-lang-es>Donde la filosofía, la lógica y la ingeniería se piensan como un mismo problema. Una selección de artículos.</p>
-      <p class="intro" data-lang-en>Where philosophy, logic and engineering are thought as one problem. A selection of articles.</p>
-    </div>
-    <ul class="article-list">
-      <li>IA agéntica no es chatbot con herramientas</li>
-      <li>Cuando la lógica se vuelve ejecutable</li>
-      <li>El agente que piensa con lógica formal</li>
-      <li>Formalizar el cerebro: lógica y filosofía en Smalltalk</li>
-      <li>El mundo que nace de una conversación</li>
-      <li>MCP y composición de agentes</li>
-      <li>Economía como sistema complejo</li>
-      <li>Cuando el universo aprende: emergencia y algoritmos</li>
-      <li>La interfaz como contrato</li>
-      <li>El problema de ser Jarvis</li>
-      <li>CQRS: la separación que revela la intención</li>
-    </ul>
+<!-- ================= § VII BLOG SCHOLḖ ================= -->
+<section class="section writing" id="blog" data-scene="escritura">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ VII</span> <span data-lang-es>Escritura</span><span data-lang-en>Writing</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Blog <em>«Scholḗ»</em></h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>The blog <em>"Scholḗ"</em></h2>
+    <p class="intro" data-reveal="up" data-lang-es>Donde la filosofía, la lógica y la ingeniería se piensan como un mismo problema. Una selección de artículos.</p>
+    <p class="intro" data-reveal="up" data-lang-en>Where philosophy, logic and engineering are thought as one problem. A selection of articles.</p>
 
-    <div class="section-head" style="margin-top:38px;">
-      <h2 style="font-size:1.6rem;" data-lang-es>Disertaciones en Medium</h2>
-      <h2 style="font-size:1.6rem;" data-lang-en>Dissertations on Medium</h2>
+    <ol class="idx">
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">01</span><span class="idx-title">IA agéntica no es chatbot con herramientas</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">02</span><span class="idx-title">Cuando la lógica se vuelve ejecutable</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">03</span><span class="idx-title">El agente que piensa con lógica formal</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">04</span><span class="idx-title">Formalizar el cerebro: lógica y filosofía en Smalltalk</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">05</span><span class="idx-title">El mundo que nace de una conversación</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">06</span><span class="idx-title">MCP y composición de agentes</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">07</span><span class="idx-title">Economía como sistema complejo</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">08</span><span class="idx-title">Cuando el universo aprende: emergencia y algoritmos</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">09</span><span class="idx-title">La interfaz como contrato</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">10</span><span class="idx-title">El problema de ser Jarvis</span></li>
+      <li class="idx-row" data-reveal="up"><span class="idx-fill"></span><span class="idx-num">11</span><span class="idx-title">CQRS: la separación que revela la intención</span></li>
+    </ol>
+
+    <h3 class="sub-title" data-reveal="up" data-lang-es>Disertaciones en Medium</h3>
+    <h3 class="sub-title" data-reveal="up" data-lang-en>Dissertations on Medium</h3>
+    <div class="essays">
+      <div class="essay" data-reveal="up">
+        <h4 data-lang-es>Crítica y dialéctica del gnosticismo</h4><h4 data-lang-en>Critique and dialectic of Gnosticism</h4>
+        <p class="essay-meta">2023 · Medium</p>
+      </div>
+      <div class="essay" data-reveal="up" style="--d:100ms">
+        <h4 data-lang-es>Ignosticismo: análisis filosófico crítico</h4><h4 data-lang-en>Ignosticism: a critical philosophical analysis</h4>
+        <p class="essay-meta">2024 · Medium</p>
+      </div>
+      <div class="essay" data-reveal="up" style="--d:200ms">
+        <h4 data-lang-es>Filosofía y programación: paradigmas y arquitecturas</h4><h4 data-lang-en>Philosophy and programming: paradigms and architectures</h4>
+        <p class="essay-meta" data-lang-es>2024 · Mapea OOP = Aristóteles, funcional = platonismo, serverless = Berkeley.</p>
+        <p class="essay-meta" data-lang-en>2024 · Maps OOP = Aristotle, functional = Platonism, serverless = Berkeley.</p>
+      </div>
     </div>
-    <div class="grid grid-3">
-      <div class="card">
-        <h3 data-lang-es>Crítica y dialéctica del gnosticismo</h3><h3 data-lang-en>Critique and dialectic of Gnosticism</h3>
-        <p>2023 · Medium</p>
-      </div>
-      <div class="card">
-        <h3 data-lang-es>Ignosticismo: análisis filosófico crítico</h3><h3 data-lang-en>Ignosticism: a critical philosophical analysis</h3>
-        <p>2024 · Medium</p>
-      </div>
-      <div class="card">
-        <h3 data-lang-es>Filosofía y programación: paradigmas y arquitecturas</h3><h3 data-lang-en>Philosophy and programming: paradigms and architectures</h3>
-        <p data-lang-es>2024 · Mapea OOP = Aristóteles, funcional = platonismo, serverless = Berkeley.</p>
-        <p data-lang-en>2024 · Maps OOP = Aristotle, functional = Platonism, serverless = Berkeley.</p>
-      </div>
-    </div>
-    <div class="btn-row">
-      <a class="btn btn-ghost" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-es>Leer el blog «Scholḗ»</a>
-      <a class="btn btn-ghost" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-en>Read the blog "Scholḗ"</a>
-      <a class="btn btn-ghost" href="https://medium.com/@stevenvallejo780" target="_blank" rel="noopener">Medium</a>
+    <div class="btn-row" data-reveal="up">
+      <a class="btn-pill magnetic" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-es><span class="btn-pill-fill"></span>Leer el blog «Scholḗ»<span class="btn-pill-arrow" aria-hidden="true">↗</span></a>
+      <a class="btn-pill magnetic" href="https://schole.stevenvallejo.com" target="_blank" rel="noopener" data-lang-en><span class="btn-pill-fill"></span>Read the blog "Scholḗ"<span class="btn-pill-arrow" aria-hidden="true">↗</span></a>
+      <a class="btn-line" href="https://medium.com/@stevenvallejo780" target="_blank" rel="noopener">Medium <span aria-hidden="true">↗</span></a>
     </div>
   </div>
 </section>
 
-<!-- ================= FORMACIÓN ================= -->
-<section class="block" id="formacion">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Formación</div>
-      <div class="eyebrow" data-lang-en>Education</div>
-      <h2 data-lang-es>Estudios</h2>
-      <h2 data-lang-en>Studies</h2>
-    </div>
-    <div class="card">
-      <div class="edu-row">
+<!-- ================= § VIII FORMACIÓN + § IX COMPETENCIAS ================= -->
+<section class="section studies" id="formacion" data-scene="formacion">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ VIII</span> <span data-lang-es>Formación</span><span data-lang-en>Education</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Estudios</h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>Studies</h2>
+    <div class="edu">
+      <div class="edu-row" data-reveal="up">
+        <span class="yr">2025 — est. 2029</span>
         <span class="inst">Universidad de Antioquia</span>
         <span class="prog" data-lang-es>Filosofía</span><span class="prog" data-lang-en>Philosophy</span>
-        <span class="state" data-lang-es>· Estudiante activo, en curso</span><span class="state" data-lang-en>· Active student, in progress</span>
-        <span class="yr">2025 — est. 2029</span>
+        <span class="state" data-lang-es>Estudiante activo, en curso</span><span class="state" data-lang-en>Active student, in progress</span>
       </div>
-      <div class="edu-row">
+      <div class="edu-row" data-reveal="up">
+        <span class="yr">2017</span>
         <span class="inst">SENA</span>
         <span class="prog" data-lang-es>Técnico en Desarrollo de Software</span><span class="prog" data-lang-en>Software Development Technician</span>
-        <span class="state" data-lang-es>· Graduado</span><span class="state" data-lang-en>· Graduated</span>
-        <span class="yr">2017</span>
+        <span class="state" data-lang-es>Graduado</span><span class="state" data-lang-en>Graduated</span>
       </div>
-      <div class="edu-row">
+      <div class="edu-row" data-reveal="up">
+        <span class="yr">2017</span>
         <span class="inst">SENA</span>
         <span class="prog" data-lang-es>Desarrollo para HTC VR</span><span class="prog" data-lang-en>Development for HTC VR</span>
-        <span class="state" data-lang-es>· Completado</span><span class="state" data-lang-en>· Completed</span>
-        <span class="yr">2017</span>
+        <span class="state" data-lang-es>Completado</span><span class="state" data-lang-en>Completed</span>
       </div>
-      <div class="edu-row">
+      <div class="edu-row" data-reveal="up">
+        <span class="yr">2017</span>
         <span class="inst">CENSA</span>
         <span class="prog" data-lang-es>Desarrollo de videojuegos</span><span class="prog" data-lang-en>Video game development</span>
-        <span class="state" data-lang-es>· Completado</span><span class="state" data-lang-en>· Completed</span>
-        <span class="yr">2017</span>
+        <span class="state" data-lang-es>Completado</span><span class="state" data-lang-en>Completed</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= COMPETENCIAS FILOSÓFICAS ================= -->
-<section class="block" id="competencias">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Filosofía y lógica</div>
-      <div class="eyebrow" data-lang-en>Philosophy and logic</div>
-      <h2 data-lang-es>Competencias</h2>
-      <h2 data-lang-en>Competencies</h2>
-    </div>
-    <div class="card skills-cat">
+<section class="section skills" id="competencias" data-scene="competencias">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ IX</span> <span data-lang-es>Filosofía y lógica</span><span data-lang-en>Philosophy and logic</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Competencias</h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>Competencies</h2>
+    <div class="skills-head" data-reveal="up">
       <h3 data-lang-es>Áreas de dominio</h3><h3 data-lang-en>Areas of command</h3>
       <p class="skills-note" data-lang-es>Agrupadas por nivel cualitativo, sin porcentajes.</p>
       <p class="skills-note" data-lang-en>Grouped by qualitative level, no percentages.</p>
-      <div class="skill-row"><span class="lbl" data-lang-es>Lógica formal</span><span class="lbl" data-lang-en>Formal logic</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Filosofía analítica</span><span class="lbl" data-lang-en>Analytic philosophy</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Argumentación</span><span class="lbl" data-lang-en>Argumentation</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Epistemología</span><span class="lbl" data-lang-en>Epistemology</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Filosofía de la mente</span><span class="lbl" data-lang-en>Philosophy of mind</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Filosofía de la IA</span><span class="lbl" data-lang-en>Philosophy of AI</span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Lógica simbólica</span><span class="lbl" data-lang-en>Symbolic logic</span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Ética</span><span class="lbl" data-lang-en>Ethics</span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
-      <div class="skill-row"><span class="lbl" data-lang-es>Teoría de tipos</span><span class="lbl" data-lang-en>Type theory</span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
-      <div class="skill-row"><span class="lbl">SAT solving</span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Lógica formal</span><span class="lbl" data-lang-en>Formal logic</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Filosofía analítica</span><span class="lbl" data-lang-en>Analytic philosophy</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Argumentación</span><span class="lbl" data-lang-en>Argumentation</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Epistemología</span><span class="lbl" data-lang-en>Epistemology</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Filosofía de la mente</span><span class="lbl" data-lang-en>Philosophy of mind</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Filosofía de la IA</span><span class="lbl" data-lang-en>Philosophy of AI</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl adv" data-lang-es>Avanzado</span><span class="lvl adv" data-lang-en>Advanced</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Lógica simbólica</span><span class="lbl" data-lang-en>Symbolic logic</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Ética</span><span class="lbl" data-lang-en>Ethics</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl" data-lang-es>Teoría de tipos</span><span class="lbl" data-lang-en>Type theory</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
+      <div class="skill-row" data-reveal="up"><span class="lbl">SAT solving</span><span class="lead-dots" aria-hidden="true"></span><span class="lvl inter" data-lang-es>Intermedio</span><span class="lvl inter" data-lang-en>Intermediate</span></div>
     </div>
   </div>
 </section>
 
-<!-- ================= QUOTE BAND ================= -->
-<section class="quote-band">
-  <div class="wrap">
-    <blockquote data-lang-es>«Dejé de querer tener razón. Empecé a ver.»</blockquote>
-    <blockquote data-lang-en>"I stopped wanting to be right. I started to see."</blockquote>
-    <cite>Steven Vallejo Ortiz</cite>
+<!-- ================= CITA ================= -->
+<section class="quote-band" data-scene="quote">
+  <div class="container">
+    <blockquote class="quote-text" data-words data-lang-es>«Dejé de querer tener razón. <em>Empecé a ver.»</em></blockquote>
+    <blockquote class="quote-text" data-words data-lang-en>"I stopped wanting to be right. <em>I started to see."</em></blockquote>
+    <cite data-reveal="fade">— Steven Vallejo Ortiz</cite>
   </div>
 </section>
 
-<!-- ================= OBRA / PROYECTOS ================= -->
-<section class="block" id="obra">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>La obra</div>
-      <div class="eyebrow" data-lang-en>The work</div>
-      <h2 data-lang-es>Proyectos filosóficos y de lógica</h2>
-      <h2 data-lang-en>Philosophical and logic projects</h2>
-      <p class="intro" data-lang-es>Donde la filosofía no es decoración, sino el motor: lógica ejecutable, vida artificial, fenomenología y simulación.</p>
-      <p class="intro" data-lang-en>Where philosophy is not decoration but the engine: executable logic, artificial life, phenomenology and simulation.</p>
-    </div>
+<!-- ================= § X OBRA / PROYECTOS ================= -->
+<section class="section work" id="obra" data-scene="obra">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ X</span> <span data-lang-es>La obra</span><span data-lang-en>The work</span></p>
+    <h2 class="section-title" data-reveal="clip" data-lang-es>Proyectos filosóficos <em>y de lógica</em></h2>
+    <h2 class="section-title" data-reveal="clip" data-lang-en>Philosophical <em>and logic projects</em></h2>
+    <p class="intro" data-reveal="up" data-lang-es>Donde la filosofía no es decoración, sino el motor: lógica ejecutable, vida artificial, fenomenología y simulación.</p>
+    <p class="intro" data-reveal="up" data-lang-en>Where philosophy is not decoration but the engine: executable logic, artificial life, phenomenology and simulation.</p>
 
     <!-- Lógica y lenguaje -->
-    <div class="proj-group">
-      <h3 data-lang-es>Lógica ejecutable y lenguaje</h3><h3 data-lang-en>Executable logic and language</h3>
-      <div class="grid grid-3">
-        <div class="proj star">
+    <div class="proj-group" style="--c:var(--gold)">
+      <div class="proj-group-head" data-reveal="up"><span class="pg-n">X.1</span><h3 data-lang-es>Lógica ejecutable y lenguaje</h3><h3 data-lang-en>Executable logic and language</h3><span class="pg-count"></span></div>
+      <div class="proj-grid">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/ST" target="_blank" rel="noopener">ST — Lenguaje de lógica formal ejecutable</a></h4>
           <p data-lang-es>DSL con 30+ perfiles lógicos, SAT solver CDCL, teoría de tipos MLTT y 6.333+ tests. La pieza más ambiciosa del portafolio; núcleo lógico de Agora.</p>
           <p data-lang-en>DSL with 30+ logic profiles, a CDCL SAT solver, MLTT type theory and 6,333+ tests. The most ambitious piece; the logical core of Agora.</p>
           <a class="link" href="https://github.com/stevenvo780/ST" target="_blank" rel="noopener">github.com/stevenvo780/ST</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/auto.logic" target="_blank" rel="noopener">auto.logic</a></h4>
           <p data-lang-es>Conversión de lenguaje natural a lógica formal ejecutable sin IA, con NLP basado en reglas: 11 perfiles lógicos, ~200 marcadores discursivos, cero dependencias, bilingüe.</p>
           <p data-lang-en>Natural language to executable formal logic with no AI, using rule-based NLP: 11 logic profiles, ~200 discourse markers, zero dependencies, bilingual.</p>
           <a class="link" href="https://github.com/stevenvo780/auto.logic" target="_blank" rel="noopener">github.com/stevenvo780/auto.logic</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/LogicEducation" target="_blank" rel="noopener">Logic Education</a></h4>
           <p data-lang-es>Plataforma educativa para enseñar lógica formal de forma interactiva, apoyada en el ecosistema ST.</p>
           <p data-lang-en>Educational platform to teach formal logic interactively, built on the ST ecosystem.</p>
           <a class="link" href="https://github.com/stevenvo780/LogicEducation" target="_blank" rel="noopener">github.com/stevenvo780/LogicEducation</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/helenikos" target="_blank" rel="noopener">Helenikos</a></h4>
           <p data-lang-es>Plataforma universitaria de griego antiguo (Next.js 15): analizador morfológico, diccionario etimológico y corpus anotado.</p>
           <p data-lang-en>University platform for Ancient Greek (Next.js 15): morphological analyzer, etymological dictionary and annotated corpus.</p>
           <a class="link" href="https://github.com/stevenvo780/helenikos" target="_blank" rel="noopener">github.com/stevenvo780/helenikos</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://agora.elenxos.com" target="_blank" rel="noopener">Agora</a></h4>
           <p data-lang-es>Plataforma distribuida de agentes IA cuyo razonamiento se apoya en el núcleo lógico de ST; un agente que ejecuta acciones, no solo conversa.</p>
           <p data-lang-en>Distributed AI-agent platform whose reasoning rests on the ST logical core; an agent that executes actions, not just chats.</p>
@@ -839,58 +959,58 @@
     </div>
 
     <!-- Filosofía, mente y vida artificial -->
-    <div class="proj-group">
-      <h3 data-lang-es>Filosofía de la mente y vida artificial</h3><h3 data-lang-en>Philosophy of mind and artificial life</h3>
-      <div class="grid grid-3">
-        <div class="proj star">
+    <div class="proj-group" style="--c:var(--violet)">
+      <div class="proj-group-head" data-reveal="up"><span class="pg-n">X.2</span><h3 data-lang-es>Filosofía de la mente y vida artificial</h3><h3 data-lang-en>Philosophy of mind and artificial life</h3><span class="pg-count"></span></div>
+      <div class="proj-grid">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://estructuras-preontologicas.vercel.app" target="_blank" rel="noopener">Estructuras Pre-Ontológicas</a></h4>
           <p data-lang-es>Tesis ABM+ODE: motor de simulación con protocolo de validación ablativo (EDI), 40 casos, 30 órdenes de magnitud. AUC-ROC 0,886 frente a 0,600 de ARIMA. App en vivo.</p>
           <p data-lang-en>ABM+ODE thesis: a simulation engine with an ablative validation protocol (EDI), 40 cases, 30 orders of magnitude. AUC-ROC 0.886 vs ARIMA's 0.600. Live app.</p>
           <a class="link" href="https://estructuras-preontologicas.vercel.app" target="_blank" rel="noopener">estructuras-preontologicas.vercel.app</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/TesisJacobContenidos" target="_blank" rel="noopener">Tesis Jacob — Motor de Hiperobjetos</a></h4>
           <p data-lang-es>Motor ABM+ODE para medir el «cierre operativo» de hiperobjetos (clima, epidemias, deforestación): 29 casos, métrica EDI original, tests de permutación vectorizados.</p>
           <p data-lang-en>ABM+ODE engine to measure the "operational closure" of hyperobjects (climate, epidemics, deforestation): 29 cases, an original EDI metric, vectorized permutation tests.</p>
           <a class="link" href="https://github.com/stevenvo780/TesisJacobContenidos" target="_blank" rel="noopener">github.com/stevenvo780/TesisJacobContenidos</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/FenomenologiaUrbana" target="_blank" rel="noopener">Fenomenología Urbana</a></h4>
           <p data-lang-es>Simulación de Medellín: ABM + PDE en GPU + aprendizaje por refuerzo (PyTorch), con análisis filosófico husserliano y foucaultiano. El contrapunto cálido a la lógica formal.</p>
           <p data-lang-en>A simulation of Medellín: ABM + GPU PDE + reinforcement learning (PyTorch), with Husserlian and Foucauldian analysis. The warm counterpoint to formal logic.</p>
           <a class="link" href="https://github.com/stevenvo780/FenomenologiaUrbana" target="_blank" rel="noopener">github.com/stevenvo780/FenomenologiaUrbana</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/RedesNeuronalesFilosofiaNeurociencia" target="_blank" rel="noopener">Redes Neuronales, Filosofía y Neurociencia</a></h4>
           <p data-lang-es>Presentación interactiva con simulaciones en vivo (TensorFlow.js, Three.js, Juego de la Vida) que conecta la IA con la filosofía de la mente.</p>
           <p data-lang-en>An interactive presentation with live simulations (TensorFlow.js, Three.js, Game of Life) connecting AI with the philosophy of mind.</p>
           <a class="link" href="https://github.com/stevenvo780/RedesNeuronalesFilosofiaNeurociencia" target="_blank" rel="noopener">github.com/stevenvo780/Redes...</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/UnaCartaParaIsa" target="_blank" rel="noopener"><span data-lang-es>Motor de vida artificial — ABM + RAG</span><span data-lang-en>Artificial-life engine — ABM + RAG</span></a></h4>
           <p data-lang-es>Motor de vida artificial: ABM con 30+ subsistemas y RAG sobre un corpus lingüístico propietario; render Phaser 3, backend WebSocket a 50 Hz.</p>
           <p data-lang-en>Artificial-life engine: ABM with 30+ subsystems and RAG over a proprietary linguistic corpus; Phaser 3 rendering, WebSocket backend at 50 Hz.</p>
           <a class="link" href="https://github.com/stevenvo780/UnaCartaParaIsa" target="_blank" rel="noopener"><span data-lang-es>Ver en GitHub</span><span data-lang-en>View on GitHub</span></a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/CartaParaIsa" target="_blank" rel="noopener"><span data-lang-es>Mundo simulado — ABM + PDE + RAG</span><span data-lang-en>Simulated world — ABM + PDE + RAG</span></a></h4>
           <p data-lang-es>Mundo simulado ABM+PDE+RAG sobre un corpus lingüístico propietario, con mecánicas de vínculo entre agentes.</p>
           <p data-lang-en>Simulated world ABM+PDE+RAG over a proprietary linguistic corpus, with bonding mechanics between agents.</p>
           <a class="link" href="https://github.com/stevenvo780/CartaParaIsa" target="_blank" rel="noopener"><span data-lang-es>Ver en GitHub</span><span data-lang-en>View on GitHub</span></a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/UnMundoParaIsa" target="_blank" rel="noopener"><span data-lang-es>Simulación con planificación por objetivos</span><span data-lang-en>Goal-planning life simulation</span></a></h4>
           <p data-lang-es>Motor de vida artificial con máquinas de estado, planificación por objetivos, campos de difusión/reacción y economía interna; WebSocket a 50 Hz.</p>
           <p data-lang-en>Artificial-life engine with state machines, goal planning, reaction–diffusion fields and an internal economy; WebSocket at 50 Hz.</p>
           <a class="link" href="https://github.com/stevenvo780/UnMundoParaIsa" target="_blank" rel="noopener"><span data-lang-es>Ver en GitHub</span><span data-lang-en>View on GitHub</span></a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/hiper-objeto-simulaciones" target="_blank" rel="noopener">Simulaciones de Hiperobjetos</a></h4>
           <p data-lang-es>20+ simulaciones híbridas (ABM+ODE+SEIR) para validar computacionalmente la teoría filosófica del hiperobjeto, con métrica EDI.</p>
           <p data-lang-en>20+ hybrid simulations (ABM+ODE+SEIR) to computationally validate the philosophical theory of the hyperobject, with the EDI metric.</p>
           <a class="link" href="https://github.com/stevenvo780/hiper-objeto-simulaciones" target="_blank" rel="noopener">github.com/stevenvo780/hiper-objeto-simulaciones</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/duo-eterno" target="_blank" rel="noopener">Dúo Eterno</a></h4>
           <p data-lang-es>Laboratorio interactivo de autopoiesis y vida artificial basado en la coevolución.</p>
           <p data-lang-en>Interactive laboratory of autopoiesis and artificial life based on co-evolution.</p>
@@ -900,76 +1020,76 @@
     </div>
 
     <!-- Emergencia, sistemas y ciencias formales -->
-    <div class="proj-group">
-      <h3 data-lang-es>Emergencia, sistemas y ciencias formales</h3><h3 data-lang-en>Emergence, systems and formal sciences</h3>
-      <div class="grid grid-3">
-        <div class="proj star">
+    <div class="proj-group" style="--c:var(--teal)">
+      <div class="proj-group-head" data-reveal="up"><span class="pg-n">X.3</span><h3 data-lang-es>Emergencia, sistemas y ciencias formales</h3><h3 data-lang-en>Emergence, systems and formal sciences</h3><span class="pg-count"></span></div>
+      <div class="proj-grid">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/emergentismo-tesis" target="_blank" rel="noopener">Algoritmo de Entrenamiento del Universo</a></h4>
           <p data-lang-es>Simulación del comportamiento de un universo bajo reglas físicas específicas; emergencia como entrenamiento.</p>
           <p data-lang-en>A simulation of a universe's behavior under specific physical rules; emergence as training.</p>
           <a class="link" href="https://github.com/stevenvo780/emergentismo-tesis" target="_blank" rel="noopener">github.com/stevenvo780/emergentismo-tesis</a>
         </div>
-        <div class="proj star">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/emergencia-juego-de-conwey" target="_blank" rel="noopener">Fenómenos Emergentes — Juego de la Vida</a></h4>
           <p data-lang-es>Exploración de propiedades emergentes en el Juego de la Vida de Conway.</p>
           <p data-lang-en>Exploration of emergent properties in Conway's Game of Life.</p>
           <a class="link" href="https://github.com/stevenvo780/emergencia-juego-de-conwey" target="_blank" rel="noopener">github.com/stevenvo780/emergencia-juego-de-conwey</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-MASOES" target="_blank" rel="noopener">Modelo MASOES</a></h4>
           <p data-lang-es>Simulación de sistemas adaptativos emocionales (Python).</p>
           <p data-lang-en>Simulation of emotional adaptive systems (Python).</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-MASOES" target="_blank" rel="noopener">github.com/stevenvo780/teoria-MASOES</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/complejidad-teoria" target="_blank" rel="noopener">Teoría de la Complejidad</a></h4>
           <p data-lang-es>Estudios y experimentos en teoría de la complejidad.</p>
           <p data-lang-en>Studies and experiments in complexity theory.</p>
           <a class="link" href="https://github.com/stevenvo780/complejidad-teoria" target="_blank" rel="noopener">github.com/stevenvo780/complejidad-teoria</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-sistemas" target="_blank" rel="noopener">Sistema Económico Simulado</a></h4>
           <p data-lang-es>Modelo de un sistema económico desde la teoría de sistemas: la economía como sistema complejo.</p>
           <p data-lang-en>A model of an economic system from systems theory: the economy as a complex system.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-sistemas" target="_blank" rel="noopener">github.com/stevenvo780/teoria-sistemas</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-informacion" target="_blank" rel="noopener">Teoría de la Información en Comunicación Celular</a></h4>
           <p data-lang-es>Simulación de comunicación celular mediante teoría de la información.</p>
           <p data-lang-en>Simulation of cellular communication through information theory.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-informacion" target="_blank" rel="noopener">github.com/stevenvo780/teoria-informacion</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-de-juegos" target="_blank" rel="noopener">Teoría de Juegos</a></h4>
           <p data-lang-es>Análisis y simulaciones en teoría de juegos.</p>
           <p data-lang-en>Analysis and simulations in game theory.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-de-juegos" target="_blank" rel="noopener">github.com/stevenvo780/teoria-de-juegos</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-caos" target="_blank" rel="noopener">Teoría del Caos y Atractor de Lorenz</a></h4>
           <p data-lang-es>Exploración de la teoría del caos a través del atractor de Lorenz.</p>
           <p data-lang-en>Exploration of chaos theory through the Lorenz attractor.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-caos" target="_blank" rel="noopener">github.com/stevenvo780/teoria-caos</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-desicion" target="_blank" rel="noopener">Teoría de la Decisión</a></h4>
           <p data-lang-es>Estudios en teoría de la decisión.</p>
           <p data-lang-en>Studies in decision theory.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-desicion" target="_blank" rel="noopener">github.com/stevenvo780/teoria-desicion</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/teoria-ruliat" target="_blank" rel="noopener">Gráfico RULIAT Extendido</a></h4>
           <p data-lang-es>Exploración del espacio de reglas de los autómatas celulares.</p>
           <p data-lang-en>Exploration of the rule space of cellular automata.</p>
           <a class="link" href="https://github.com/stevenvo780/teoria-ruliat" target="_blank" rel="noopener">github.com/stevenvo780/teoria-ruliat</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/emergencia-experimento-temperatura" target="_blank" rel="noopener">Experimento de Temperatura Emergente</a></h4>
           <p data-lang-es>Estudios de fenómenos emergentes relacionados con la temperatura.</p>
           <p data-lang-en>Studies of emergent phenomena related to temperature.</p>
           <a class="link" href="https://github.com/stevenvo780/emergencia-experimento-temperatura" target="_blank" rel="noopener">github.com/stevenvo780/emergencia-experimento-temperatura</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/SistemaDeTrasporteTrenes" target="_blank" rel="noopener">Sistema de Transporte en Trenes</a></h4>
           <p data-lang-es>Modelado de sistemas de transporte ferroviario.</p>
           <p data-lang-en>Modeling of railway transport systems.</p>
@@ -979,28 +1099,28 @@
     </div>
 
     <!-- Comunidad intelectual -->
-    <div class="proj-group">
-      <h3 data-lang-es>Comunidad y diálogo intelectual</h3><h3 data-lang-en>Community and intellectual dialogue</h3>
-      <div class="grid grid-3">
-        <div class="proj star">
+    <div class="proj-group" style="--c:var(--terracotta-soft)">
+      <div class="proj-group-head" data-reveal="up"><span class="pg-n">X.4</span><h3 data-lang-es>Comunidad y diálogo intelectual</h3><h3 data-lang-en>Community and intellectual dialogue</h3><span class="pg-count"></span></div>
+      <div class="proj-grid">
+        <div class="proj star" data-reveal="card">
           <h4><a href="https://www.cafeteriadelcaos.com/" target="_blank" rel="noopener">Cafetería del Caos</a></h4>
           <p data-lang-es>Comunidad intelectual virtual en Discord para el intercambio de ideas en filosofía, ciencia, literatura y arte. La plaza de los jueves: la palabra que hace pensar, en la práctica.</p>
           <p data-lang-en>A virtual intellectual community on Discord for exchanging ideas in philosophy, science, literature and art. The Thursday agora: the word that makes one think, in practice.</p>
           <a class="link" href="https://www.cafeteriadelcaos.com/" target="_blank" rel="noopener">cafeteriadelcaos.com</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://cafeteria-del-caos-front-next.vercel.app" target="_blank" rel="noopener">Cafetería del Caos (Next)</a></h4>
           <p data-lang-es>Versión optimizada de la red social de debates filosóficos.</p>
           <p data-lang-en>Optimized version of the social network for philosophical debate.</p>
           <a class="link" href="https://cafeteria-del-caos-front-next.vercel.app" target="_blank" rel="noopener">cafeteria-del-caos-front-next.vercel.app</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://github.com/stevenvo780/debatesUtil" target="_blank" rel="noopener">Debates Util</a></h4>
           <p data-lang-es>Programa para gestionar y moderar debates de forma estructurada.</p>
           <p data-lang-en>A tool to manage and moderate debates in a structured way.</p>
           <a class="link" href="https://github.com/stevenvo780/debatesUtil" target="_blank" rel="noopener">github.com/stevenvo780/debatesUtil</a>
         </div>
-        <div class="proj">
+        <div class="proj" data-reveal="card">
           <h4><a href="https://medium.com/@stevenvallejo780" target="_blank" rel="noopener">Artículos de Filosofía — Medium</a></h4>
           <p data-lang-es>Disertaciones filosóficas: gnosticismo, ignosticismo, y filosofía y programación.</p>
           <p data-lang-en>Philosophical dissertations: Gnosticism, ignosticism, and philosophy and programming.</p>
@@ -1011,39 +1131,43 @@
   </div>
 </section>
 
-<!-- ================= CONTACTO ================= -->
-<section class="block" id="contacto">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow" data-lang-es>Diálogo</div>
-      <div class="eyebrow" data-lang-en>Dialogue</div>
-      <h2 data-lang-es>Contacto</h2>
-      <h2 data-lang-en>Contact</h2>
-    </div>
+<!-- ================= § XI CONTACTO ================= -->
+<section class="section contact" id="contacto" data-scene="contacto">
+  <div class="container">
+    <p class="section-label" data-reveal="up"><span class="section-num">§ XI</span> <span data-lang-es>Diálogo</span><span data-lang-en>Dialogue</span></p>
+    <h2 class="contact-title" data-reveal="clip" data-lang-es>Contacto</h2>
+    <h2 class="contact-title" data-reveal="clip" data-lang-en>Contact</h2>
     <div class="contact-grid">
-      <div class="contact-item"><div class="k">Email</div><div class="v"><a href="mailto:stevenvallejo780@gmail.com">stevenvallejo780@gmail.com</a></div></div>
-      <div class="contact-item"><div class="k" data-lang-es>Ubicación</div><div class="k" data-lang-en>Location</div><div class="v">Medellín, Antioquia, Colombia · GMT-5</div></div>
-      <div class="contact-item"><div class="k">Blog</div><div class="v"><a href="https://schole.stevenvallejo.com" target="_blank" rel="noopener">schole.stevenvallejo.com</a></div></div>
-      <div class="contact-item"><div class="k">Web</div><div class="v"><a href="https://stevenvallejo.com" target="_blank" rel="noopener">stevenvallejo.com</a></div></div>
-      <div class="contact-item"><div class="k">GitHub</div><div class="v"><a href="https://github.com/stevenvo780" target="_blank" rel="noopener">github.com/stevenvo780</a></div></div>
-      <div class="contact-item"><div class="k">LinkedIn</div><div class="v"><a href="https://www.linkedin.com/in/steven-vallejo/" target="_blank" rel="noopener">in/steven-vallejo</a></div></div>
-      <div class="contact-item"><div class="k">Medium</div><div class="v"><a href="https://medium.com/@stevenvallejo780" target="_blank" rel="noopener">@stevenvallejo780</a></div></div>
-      <div class="contact-item"><div class="k" data-lang-es>Idiomas</div><div class="k" data-lang-en>Languages</div><div class="v" data-lang-es>Español (nativo) · Inglés (lectura y escritura)</div><div class="v" data-lang-en>Spanish (native) · English (reading & writing)</div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">Email</div><div class="v"><a href="mailto:stevenvallejo780@gmail.com">stevenvallejo780@gmail.com</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k" data-lang-es>Teléfono / WhatsApp</div><div class="k" data-lang-en>Phone / WhatsApp</div><div class="v"><a href="https://wa.me/573046374368" target="_blank" rel="noopener">+57 304 637 4368</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k" data-lang-es>Ubicación</div><div class="k" data-lang-en>Location</div><div class="v">Medellín, Antioquia, Colombia · GMT-5</div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">Blog</div><div class="v"><a href="https://schole.stevenvallejo.com" target="_blank" rel="noopener">schole.stevenvallejo.com</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">Web</div><div class="v"><a href="https://stevenvallejo.com" target="_blank" rel="noopener">stevenvallejo.com</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">GitHub</div><div class="v"><a href="https://github.com/stevenvo780" target="_blank" rel="noopener">github.com/stevenvo780</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">LinkedIn</div><div class="v"><a href="https://www.linkedin.com/in/steven-vallejo/" target="_blank" rel="noopener">in/steven-vallejo</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k">Medium</div><div class="v"><a href="https://medium.com/@stevenvallejo780" target="_blank" rel="noopener">@stevenvallejo780</a></div></div>
+      <div class="contact-item" data-reveal="up"><div class="k" data-lang-es>Idiomas</div><div class="k" data-lang-en>Languages</div><div class="v" data-lang-es>Español (nativo) · Inglés (lectura y escritura)</div><div class="v" data-lang-en>Spanish (native) · English (reading &amp; writing)</div></div>
     </div>
-    <div class="btn-row">
-      <a class="btn btn-primary" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV filosófico (ES)</a>
-      <a class="btn btn-primary" href="pdf/CV_filo_en.pdf" download data-lang-en>Download philosophy CV (EN)</a>
-      <a class="btn btn-gold" href="pdf/CV_filo_en.pdf" download data-lang-es>Descargar CV filosófico (EN)</a>
-      <a class="btn btn-gold" href="pdf/CV_filo_es.pdf" download data-lang-en>Download philosophy CV (ES)</a>
+    <div class="btn-row" data-reveal="up">
+      <a class="btn-pill magnetic" href="pdf/CV_filo_es.pdf" download data-lang-es><span class="btn-pill-fill"></span>Descargar CV filosófico (ES)<span class="btn-pill-arrow" aria-hidden="true">↓</span></a>
+      <a class="btn-pill magnetic" href="pdf/CV_filo_en.pdf" download data-lang-en><span class="btn-pill-fill"></span>Download philosophy CV (EN)<span class="btn-pill-arrow" aria-hidden="true">↓</span></a>
+      <a class="btn-line" href="pdf/CV_filo_en.pdf" download data-lang-es>Descargar CV filosófico (EN)</a>
+      <a class="btn-line" href="pdf/CV_filo_es.pdf" download data-lang-en>Download philosophy CV (ES)</a>
+      <a class="btn-line btn-wa" href="https://wa.me/573046374368" target="_blank" rel="noopener">WhatsApp <span aria-hidden="true">↗</span></a>
     </div>
   </div>
 </section>
 
-<footer class="site">
-  <div class="wrap">
-    <p>© <span id="year">2026</span> Steven Vallejo Ortiz — <span data-lang-es>Filósofo · Lógica formal · Medellín, Colombia</span><span data-lang-en>Philosopher · Formal logic · Medellín, Colombia</span></p>
-    <p data-lang-es>«Pensar antes de construir.»</p>
-    <p data-lang-en>"Think before you build."</p>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="footer-word" lang="grc" aria-hidden="true">φιλοσοφία</p>
+    <div class="footer-row">
+      <p>© <span id="year">2026</span> Steven Vallejo Ortiz — <span data-lang-es>Filósofo · Lógica formal · Medellín, Colombia</span><span data-lang-en>Philosopher · Formal logic · Medellín, Colombia</span></p>
+      <p class="footer-motto" data-lang-es>«Pensar antes de construir.»</p>
+      <p class="footer-motto" data-lang-en>"Think before you build."</p>
+    </div>
     <nav class="footer-ecosystem" aria-label="Ecosistema Mouseîon">
       <span class="footer-ecosystem-label">Parte de <a href="https://www.stevenvallejo.com">Mouseîon</a> · por Steven Vallejo</span>
       <span class="footer-ecosystem-links">
@@ -1056,6 +1180,7 @@
   </div>
 </footer>
 
-<script src="app.js"></script>
+<script src="graph.js" defer></script>
+<script src="app.js" defer></script>
 </body>
 </html>
