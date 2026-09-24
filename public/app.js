@@ -328,10 +328,9 @@
 
     vel += sy - lastScroll;
     if (header && !menuOpen) {
+      // La cabecera es siempre visible (lleva los accesos del ecosistema y WhatsApp):
+      // al hacer scroll solo gana fondo sólido, nunca se oculta.
       header.setAttribute("data-scrolled", String(sy > 30));
-      var goingDown = sy > lastScroll;
-      if (sy > 480 && goingDown && sy - lastScroll > 2) header.setAttribute("data-hidden", "true");
-      else if (!goingDown || sy < 480) header.setAttribute("data-hidden", "false");
     }
     lastScroll = sy;
 

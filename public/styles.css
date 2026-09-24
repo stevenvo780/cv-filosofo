@@ -208,7 +208,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .site-header {
   position: fixed; inset: 0 0 auto 0; z-index: 60; height: var(--header-h);
   border-bottom: 1px solid transparent;
-  transition: transform 0.7s var(--ease-out), background-color 0.4s ease, border-color 0.4s ease;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 .site-header[data-scrolled="true"] {
   background: rgba(9, 16, 19, 0.66);
@@ -216,7 +216,6 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   backdrop-filter: blur(16px) saturate(1.4);
   border-color: var(--line);
 }
-.site-header[data-hidden="true"] { transform: translateY(-100%); }
 .site-header[data-open="true"] {
   background: transparent; border-color: transparent;
   -webkit-backdrop-filter: none; backdrop-filter: none; transform: none;
@@ -260,6 +259,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 .eco-link:hover { background: rgba(224, 168, 94, 0.14); color: var(--gold); }
+.eco-s { display: none; }
 
 .wa-btn {
   display: inline-flex; align-items: center; gap: 0.5rem; flex: none;
@@ -303,16 +303,14 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   .eco-nav { margin-left: auto; }
   .menu-btn { display: inline-flex; }
 }
+/* Tablet: los accesos del ecosistema siguen en la barra, con rótulos cortos. */
 @media (max-width: 1023px) {
-  .eco-nav { display: none; }
-  .wa-btn { margin-left: auto; }
-}
-@media (max-width: 640px) {
+  .eco-l { display: none; }
+  .eco-s { display: inline; }
+  .eco-link { padding: 0.4rem 0.62rem; }
   .brand-tag { display: none; }
-  .brand-name { font-size: 1.18rem; }
   .wa-btn { width: 40px; height: 40px; padding: 0; justify-content: center; }
   .wa-label { display: none; }
-  .site-header-inner > .lang-toggle { display: none; }
   .menu-btn-text { display: none; }
   .menu-btn { padding: 0; border: 0; background: none; height: 40px; }
   .menu-btn-icon { width: 40px; height: 40px; }
@@ -320,6 +318,22 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   .menu-btn-icon i:first-child { top: 17px; }
   .menu-btn-icon i:last-child { top: 22px; }
   .menu-btn[aria-expanded="true"] .menu-btn-icon i { top: 19.5px; }
+}
+/* Móvil: la barra gana una segunda fila con los accesos, siempre visible. */
+@media (max-width: 720px) {
+  :root { --header-h: 106px; }
+  .site-header-inner { flex-wrap: wrap; align-content: center; row-gap: 0.45rem; column-gap: 0.55rem; }
+  .brand { margin-right: auto; }
+  .eco-nav {
+    order: 9; flex: 1 0 100%; margin-left: 0; justify-content: space-between;
+    padding: 0.18rem; transition: opacity 0.3s ease;
+  }
+  .eco-link { flex: 1 1 auto; text-align: center; padding: 0.38rem 0.3rem; font-size: 0.74rem; }
+  .site-header[data-open="true"] .eco-nav { opacity: 0; visibility: hidden; }
+}
+@media (max-width: 640px) {
+  .brand-name { font-size: 1.18rem; }
+  .site-header-inner > .lang-toggle { display: none; }
 }
 
 /* ---------- Menú a pantalla completa ---------- */
