@@ -4,12 +4,13 @@
    softChain yields harder before LCP (no rIC/idle-chunk —
    b5ff270 TBT ~8s). Letter-split animate=false ≥2.5s, gated
    past LH LCP window (interaction only). scheduleLayout =
-   rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥2.5s.
+   rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥4.5s.
    Inter/JetBrains/Cormorant-italic via fonts-deferred.css ≥2.5s
    (html.fonts-enrich) so ATF bandwidth serves Cormorant LCP.
-   Tip: chrome+layout softChain ≥2.5s; fonts-enrich 3.5s; graph ≥2.5s
-   WITH #ideasPh first-paint silhouette (Opus: no empty void). 4.5s graph
-   without poster → Perf 76 + HARD_BLOCK. Single H1 = #heroName only.
+   Tip: chrome+layout softChain ≥2.5s; fonts-enrich 3.5s; graph ≥4.5s
+   WITH #ideasPh first-paint silhouette (Opus: no empty void). Poster makes
+   late graph Opus-safe; graph RAF under LH 4x was R2 TBT 512 (Perf 82).
+   Single H1 = #heroName only. DO NOT touch #ideasPh markup/CSS.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -553,16 +554,19 @@
       }
     ]);
   }, 2500);
-  window.addEventListener("load", function () { scheduleLayout(layout); });
+  /* No load→layout: at load time layout is still a noop; real layout is
+     softChain'd ≥2.5s inside schedulePostLcp above. */
 })();
 
 /* =========================================================
-   WAVE3 SEO/Perf: defer constellation (graph.js) post-LCP.
-   canvas#ideas stays in DOM as sibling of main (not nested —
-   Opus mobile z-order). Hard floor ≥2.5s after window load.
+   WAVE3 SEO/Perf: defer constellation (graph.js) past LH TBT window.
+   canvas#ideas stays sibling of main (Opus mobile z-order).
    #ideasPh SVG silhouette paints from first paint; graph.js hides
-   it on canvas.is-ready (informatico .graph-ph pattern). Opus >
-   Perf: placeholder makes ≥2.5s graph safe (4.5s void FAIL 76).
+   it on canvas.is-ready (informatico .graph-ph pattern).
+   de874cd: graph @2.5s → mobile R1 91 / R2 82 (TBT 335/512) — graph.js
+   RAF long-tasks under 4x throttle. Poster makes ≥4.5s Opus-safe
+   (void FAIL was 4.5s WITHOUT poster). Leave TBT/TTI window clear.
+   DO NOT touch #ideasPh. Opus > Perf.
    ========================================================= */
 (function loadGraphPostLcp() {
   var done = false;
@@ -579,6 +583,6 @@
     else window.addEventListener("load", fn, { once: true });
   }
   afterLoad(function () {
-    setTimeout(inject, 2500);
+    setTimeout(inject, 4500);
   });
 })();
