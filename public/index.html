@@ -91,7 +91,8 @@
      EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS).
      LCP = h1.hero-title PLAIN TEXT (no data-split, no .ln spans): preload H1 woff2; critical ATF CSS;
      styles.css RENDER-BLOCKING (no async). JSON-LD post-body for earlier H1 bytes on mobile.
-     Soft-reset idle-chunk (TBT outliers); LCP-safe letter-split ≥2.5s (no entrance/italic on wrap). No covering preloader. -->
+     HYBRID: soft-yield ATF chrome after first paint (cut ~85% LCP renderDelay) WITHOUT rIC/idle-chunk
+     (b5ff270 TBT ~8s). LCP-safe letter-split ≥2.5s (no entrance/italic on wrap). No covering preloader. -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
@@ -145,7 +146,6 @@
     text-shadow: 0 10px 60px rgba(5, 10, 12, 0.45);
     visibility: visible;
     opacity: 1;
-    contain: layout style;
   }
   @media (max-width: 767px) {
     .hero { padding-top: calc(72px + 38vh); }
