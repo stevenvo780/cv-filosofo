@@ -87,9 +87,11 @@
 <meta property="article:tag" content="Ética" />
 <meta property="article:tag" content="Mouseîon" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<!-- Wave3 SEO/Perf: self-host Cormorant/Inter/JetBrains (latin) — same faces, no render-blocking googleapis.
+     EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS). -->
+<link rel="preload" href="fonts/cormorant-garamond-italic-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
 <script>
   /* Marca JS temprano (estados iniciales de los revelados) y decide si mostrar el preloader. */
   (function (d) {
@@ -356,7 +358,7 @@
 <header class="site-header" id="header">
   <div class="site-header-inner">
     <a href="https://www.stevenvallejo.com" class="brand" aria-label="Mouseîon — Steven Vallejo">
-      <img src="isotipo.png" alt="Lemniscata Mouseîon" class="brand-logo" width="34" height="34" />
+      <img src="icon.svg" alt="Lemniscata Mouseîon" class="brand-logo" width="34" height="34" decoding="async" />
       <span class="brand-word">
         <span class="brand-name">Steven Vallejo</span>
         <span class="brand-tag">Mouseîon · <span data-lang-es>CV filósofo</span><span data-lang-en>Philosophy CV</span></span>
@@ -447,8 +449,8 @@
       <span class="hero-greek" lang="grc" aria-hidden="true">φιλόσοφος</span>
     </div>
 
-    <h1 class="hero-title" data-split data-lang-es><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
-    <h1 class="hero-title" data-split data-lang-en><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
+    <!-- Wave3: single indexable H1 (name identical ES/EN); keep data-split for letter reveal -->
+    <h1 class="hero-title" data-split><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
 
     <div class="hero-sub">
       <p class="hero-kicker" data-reveal="up" data-lang-es>Pensar antes de construir.</p>
@@ -1180,7 +1182,7 @@
   </div>
 </footer>
 
-<script src="graph.js" defer></script>
+<!-- Wave3: graph.js injected ≥2.5s post-load from app.js (keeps canvas#ideas constellation; avoids LCP fight) -->
 <script src="app.js" defer></script>
 </body>
 </html>

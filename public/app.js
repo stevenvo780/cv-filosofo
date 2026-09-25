@@ -416,3 +416,27 @@
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { tracks.forEach(function (t) { t.w = 0; }); layout(); });
   window.addEventListener("load", layout);
 })();
+
+/* =========================================================
+   WAVE3 SEO/Perf: defer constellation (graph.js) post-LCP.
+   canvas#ideas stays in DOM; early-return guard in graph.js
+   requires the canvas. Hard floor 2.5s after window load.
+   ========================================================= */
+(function loadGraphPostLcp() {
+  var done = false;
+  function inject() {
+    if (done) return;
+    done = true;
+    var s = document.createElement("script");
+    s.src = "graph.js";
+    s.defer = true;
+    document.body.appendChild(s);
+  }
+  function afterLoad(fn) {
+    if (document.readyState === "complete") fn();
+    else window.addEventListener("load", fn, { once: true });
+  }
+  afterLoad(function () {
+    setTimeout(inject, 2500);
+  });
+})();
