@@ -100,21 +100,17 @@
   })(document);
 </script>
 <style>
-  /* Critical path: discover Cormorant before styles.css; optional = cero FOIT */
+  /* Critical path: discover Cormorant before styles.css; swap + matched fallback keeps CLS stable */
   @font-face {
     font-family: "Cormorant Garamond";
     font-style: normal;
     font-weight: 300 700;
-    font-display: optional;
-    size-adjust: 106%;
-    ascent-override: 90%;
-    descent-override: 22%;
-    line-gap-override: 0%;
+    font-display: swap;
     src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
   }
-  /* Metric-matched fallback so optional miss does not shift H1 */
+  /* Metric-matched Georgia fallback keeps the swap CLS-safe */
   @font-face {
-    font-family: "Cormorant Fallback";
+    font-family: "Cormorant Garamond Fallback";
     src: local("Georgia"), local("Times New Roman");
     size-adjust: 103%;
     ascent-override: 90%;
@@ -122,7 +118,7 @@
     line-gap-override: 0%;
   }
   .hero-title {
-    font-family: "Cormorant Garamond", "Cormorant Fallback", Georgia, serif;
+    font-family: "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
     font-weight: 500;
     font-size: clamp(3.6rem, 11.2vw, 13rem);
     line-height: 0.84;

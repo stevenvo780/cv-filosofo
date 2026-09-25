@@ -2,29 +2,30 @@
    Self-hosted latin subsets (Wave3 SEO/Perf)
    Faces: Cormorant Garamond + Inter + JetBrains Mono — Paideía / Opus look.
    EB Garamond (Greek) intentionally not self-hosted; falls back to Cormorant.
-   LCP face (Cormorant): font-display:optional so fallback paints without swap wait.
+   font-display:swap on brand faces; matched Georgia fallback keeps swaps CLS-safe.
    ========================================================= */
-/* Self-hosted latin woff2 — metric overrides cut fallback CLS on hero/epigraph */
+/* Adjusted system fallback ≈ Cormorant metrics so font-display:swap stays CLS-safe */
+@font-face {
+  font-family: "Cormorant Garamond Fallback";
+  src: local("Georgia"), local("Times New Roman"), local("Times"), local("Noto Serif"), local("DejaVu Serif");
+  size-adjust: 103%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+/* Self-hosted latin woff2 — keep metrics on the fallback, not the webfont */
 @font-face {
   font-family: "Cormorant Garamond";
   font-style: normal;
   font-weight: 300 700;
-  font-display: optional;
-  size-adjust: 106%;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
+  font-display: swap;
   src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
 }
 @font-face {
   font-family: "Cormorant Garamond";
   font-style: italic;
   font-weight: 300 700;
-  font-display: optional;
-  size-adjust: 106%;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
+  font-display: swap;
   src: url("fonts/cormorant-garamond-italic-latin.woff2") format("woff2");
 }
 @font-face {
@@ -78,8 +79,8 @@
   --maxw: 1440px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
-  --font-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;
-  --font-greek: "EB Garamond", "Cormorant Garamond", Georgia, serif;
+  --font-display: "Cormorant Garamond", "Cormorant Garamond Fallback", "EB Garamond", Georgia, serif;
+  --font-greek: "EB Garamond", "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Fira Code", Consolas, monospace;
 }
