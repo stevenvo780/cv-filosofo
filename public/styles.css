@@ -2,7 +2,7 @@
    Self-hosted latin subsets (Wave3 SEO/Perf)
    Faces: Cormorant Garamond + Inter + JetBrains Mono — Paideía / Opus look.
    EB Garamond (Greek) intentionally not self-hosted; falls back to Cormorant.
-   font-display:swap on brand faces; matched Georgia fallback keeps swaps CLS-safe.
+   font-display:swap + Georgia fallback (no webfont size-adjust); Fallback metrics CLS-safe.
    ========================================================= */
 /* Adjusted system fallback ≈ Cormorant metrics so font-display:swap stays CLS-safe */
 @font-face {
@@ -33,10 +33,6 @@
   font-style: normal;
   font-weight: 300 700;
   font-display: swap;
-  size-adjust: 100%;
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
   src: url("fonts/inter-latin.woff2") format("woff2");
 }
 @font-face {
@@ -44,7 +40,6 @@
   font-style: normal;
   font-weight: 300 700;
   font-display: swap;
-  size-adjust: 100%;
   src: url("fonts/jetbrains-mono-latin.woff2") format("woff2");
 }
 

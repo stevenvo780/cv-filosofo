@@ -1,10 +1,10 @@
 /* =========================================================
    CV Filósofo — interacción (sin dependencias)
-   WAVE3 hybrid tip: early #heroName paint by cutting ATF sync
-   (2fc6681 LCP renderDelay ~85%) + stable TBT via soft-yield
-   boot (rAF+setTimeout(0) — NEVER requestIdleCallback /
-   idle-chunk pump; that spiked b5ff270 TBT ~8s).
-   LCP-safe letter-split: animate=false, accent-pending, ≥2.5s.
+   WAVE3: earlier H1 — Cormorant preload/critical first bytes;
+   softChain yields harder before LCP (no rIC/idle-chunk —
+   b5ff270 TBT ~8s). Letter-split animate=false ≥2.5s, gated
+   past LH LCP window (interaction only). scheduleLayout =
+   rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥2.5s.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -62,8 +62,7 @@
   }
   langButtons.forEach(function (b) { b.addEventListener("click", function () { applyLang(b.getAttribute("data-set-lang")); }); });
 
-  var y = doc.getElementById("year");
-  if (y) y.textContent = String(new Date().getFullYear());
+  /* year text filled in softChain (post-paint) */
 
   /* ---------- Contadores: DOM fill deferred post-paint ---------- */
   function initCounters() {
@@ -138,21 +137,38 @@
     });
   }
   function scheduleHeroSplit() {
-    /* animate=false: data-entrance + heroCharIn re-paint H1 → LCP inflation */
-    function run() { splitHeroTitles(false); }
+    /* animate=false: data-entrance + heroCharIn re-paint H1 → LCP inflation.
+       02b122f: split at load+2.5s still landed inside LH LCP window (snippet
+       showed data-split-done). Gate ≥2.5s then wait for interaction OR 6s
+       so plain #heroName can finalize LCP first. */
+    function run() {
+      splitHeroTitles(false);
+      setTimeout(function () {
+        $$(".hero-title .accent-pending").forEach(function (el) {
+          el.className = "w accent";
+        });
+      }, 2000);
+    }
     function afterLoad(fn) {
       if (doc.readyState === "complete") fn();
       else window.addEventListener("load", fn, { once: true });
     }
     afterLoad(function () {
       setTimeout(function () {
-        run();
-        /* Gold/italic accent well after split (keeps wrap paint-neutral for LCP) */
-        setTimeout(function () {
-          $$(".hero-title .accent-pending").forEach(function (el) {
-            el.className = "w accent";
+        /* No auto-timer: a delayed split still updates LCP under LH (no input).
+           Real users scroll/tap; plain #heroName stays the LCP candidate in lab. */
+        var done = false;
+        function once() {
+          if (done) return;
+          done = true;
+          ["scroll", "pointerdown", "touchstart", "keydown"].forEach(function (ev) {
+            window.removeEventListener(ev, once, true);
           });
-        }, 2000);
+          softYield(run);
+        }
+        ["scroll", "pointerdown", "touchstart", "keydown"].forEach(function (ev) {
+          window.addEventListener(ev, once, { capture: true, passive: true });
+        });
       }, 2500);
     });
   }
@@ -474,20 +490,28 @@
     });
     }, 3600);
 
-  /* ---------- Arranque híbrido: paint #heroName first, then soft-yield chrome ---------- */
-  applyLang(initialLang());
-  langBoot = false;
+  /* ---------- Arranque: paint #heroName first; softChain yields harder before chrome ---------- */
+  /* Early body.en script already set lang class for FOUC; full applyLang soft-yielded. */
   /* rAF+timeout — not rIC(timeout): under LH 4x throttle rIC deadlines
      coalesce into multi-second long tasks (b5ff270 TBT ~8s outlier). */
   function scheduleLayout(fn) {
     requestAnimationFrame(function () { setTimeout(fn, 0); });
   }
-  /* Double-rAF → first paint committed, THEN soft-yield heavy work.
-     Keeps LCP renderDelay down without the idle-chunk TBT spike. */
+  /* Double-rAF → first paint committed, THEN extra soft yields so LCP can
+     settle on plain #heroName before counters/reveals/areas steal the thread. */
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       softChain([
+        function () {}, /* yield: let H1 paint commit */
+        function () {}, /* yield: keep renderer free */
+        function () {
+          applyLang(initialLang());
+          langBoot = false;
+          var y = doc.getElementById("year");
+          if (y) y.textContent = String(new Date().getFullYear());
+        },
         initCounters,
+        function () {}, /* yield before heavy chrome */
         initChromeAndLayout,
         function () { scheduleLayout(layout); },
         function () {
