@@ -88,7 +88,10 @@
             ch.textContent.split(/(\s+)/).forEach(function (part) {
               if (!part) return;
               if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
-              var w = doc.createElement("span"); w.className = "w"; w.setAttribute("aria-hidden", "true");
+              var w = doc.createElement("span");
+              /* Accent polish post-LCP: Vallejo was plain text on first paint */
+              w.className = part === "Vallejo" ? "w accent" : "w";
+              w.setAttribute("aria-hidden", "true");
               part.split("").forEach(function (c) {
                 var s = doc.createElement("span"); s.className = "c"; s.textContent = c;
                 s.style.setProperty("--i", i++); w.appendChild(s);
@@ -96,7 +99,7 @@
               frag.appendChild(w);
             });
             ch.parentNode.replaceChild(frag, ch);
-          } else if (ch.nodeType === 1) walk(ch);
+          } else if (ch.nodeType === 1 && ch.tagName !== "BR") walk(ch);
         });
       })(h);
       if (animate && !reduce) h.setAttribute("data-entrance", "1");
@@ -117,25 +120,43 @@
   }
   scheduleHeroSplit();
 
-  /* ---------- Palabras que se iluminan con el scroll ---------- */
-  var wordBlocks = $$("[data-words]").map(function (el) {
-    var words = [];
-    (function walk(node) {
-      Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
-        if (ch.nodeType === 3) {
-          var frag = doc.createDocumentFragment();
-          ch.textContent.split(/(\s+)/).forEach(function (part) {
-            if (!part) return;
-            if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
-            var s = doc.createElement("span"); s.className = "mf-w"; s.textContent = part;
-            words.push(s); frag.appendChild(s);
-          });
-          ch.parentNode.replaceChild(frag, ch);
-        } else if (ch.nodeType === 1) walk(ch);
-      });
-    })(el);
-    return { el: el, words: words, last: -1 };
-  });
+  /* ---------- Post-LCP idle: defer TBT-heavy hero polish (words + pointer FX) ---------- */
+  function schedulePostLcp(fn) {
+    function afterLoad(run) {
+      if (doc.readyState === "complete") run();
+      else window.addEventListener("load", run, { once: true });
+    }
+    afterLoad(function () {
+      setTimeout(function () {
+        if ("requestIdleCallback" in window) requestIdleCallback(fn, { timeout: 1200 });
+        else fn();
+      }, 2500);
+    });
+  }
+  /* ---------- Palabras que se iluminan (DOM wrap AFTER LCP — was major TBT) ---------- */
+  var wordBlocks = [];
+  function initWordBlocks() {
+    if (wordBlocks.length) return;
+    wordBlocks = $$("[data-words]").map(function (el) {
+      var words = [];
+      (function walk(node) {
+        Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
+          if (ch.nodeType === 3) {
+            var frag = doc.createDocumentFragment();
+            ch.textContent.split(/(\s+)/).forEach(function (part) {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
+              var s = doc.createElement("span"); s.className = "mf-w"; s.textContent = part;
+              words.push(s); frag.appendChild(s);
+            });
+            ch.parentNode.replaceChild(frag, ch);
+          } else if (ch.nodeType === 1) walk(ch);
+        });
+      })(el);
+      return { el: el, words: words, last: -1 };
+    });
+  }
+  schedulePostLcp(initWordBlocks);
 
   /* ---------- Ready (no covering preloader — was ~1.5s+ LCP render delay) ---------- */
   function ready() { root.classList.add("is-ready"); }
@@ -372,8 +393,10 @@
   window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(layout, 150); });
   if (pinnable.addEventListener) pinnable.addEventListener("change", layout);
 
-  /* ---------- Cursor, botones magnéticos y tarjetas con luz ---------- */
-  if (finePointer && !reduce) {
+  /* ---------- Cursor / magnetic / card tilt — AFTER LCP (pointer FX is TBT) ---------- */
+  schedulePostLcp(function initPointerFx() {
+    if (!(finePointer && !reduce)) return;
+
     root.classList.add("has-cursor");
     var cur = doc.querySelector(".cursor"), dot = cur.querySelector(".cursor-dot"), ring = cur.querySelector(".cursor-ring");
     var mx = -100, my = -100, rx = -100, ry = -100;
@@ -408,7 +431,7 @@
       });
       c.addEventListener("pointerleave", function () { c.style.transform = ""; });
     });
-  }
+    });
 
   /* ---------- Arranque ---------- */
   applyLang(initialLang());

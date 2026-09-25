@@ -89,9 +89,9 @@
 
 <!-- Wave3 SEO/Perf: self-host Cormorant/Inter/JetBrains (latin) — same faces, no render-blocking googleapis.
      EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS).
-     LCP = h1.hero-title: preload H1 face; critical font-size; no covering preloader (intro-pending skipped). -->
+     LCP = h1.hero-title PLAIN TEXT (no .ln spans): preload exact H1 woff2; critical @font-face + metrics;
+     letter-split / italic accent only post-LCP (≥2.5s). No covering preloader. -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" href="fonts/cormorant-garamond-italic-latin.woff2" as="font" type="font/woff2" crossorigin />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
   (function (d) {
@@ -100,16 +100,37 @@
   })(document);
 </script>
 <style>
-  /* Critical: H1 size before styles.css so first paint has correct LCP metrics; Cormorant stays optional */
+  /* Critical path: discover Cormorant before styles.css; optional = cero FOIT */
+  @font-face {
+    font-family: "Cormorant Garamond";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: optional;
+    size-adjust: 106%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+    src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
+  }
+  /* Metric-matched fallback so optional miss does not shift H1 */
+  @font-face {
+    font-family: "Cormorant Fallback";
+    src: local("Georgia"), local("Times New Roman");
+    size-adjust: 103%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+  }
   .hero-title {
-    font-family: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+    font-family: "Cormorant Garamond", "Cormorant Fallback", Georgia, serif;
     font-weight: 500;
     font-size: clamp(3.6rem, 11.2vw, 13rem);
     line-height: 0.84;
+    letter-spacing: -0.045em;
+    color: #e8e0d4;
     visibility: visible;
     opacity: 1;
   }
-  .hero-title .ln { display: block; }
 </style>
 <link rel="stylesheet" href="styles.css" />
 
@@ -459,7 +480,8 @@
     </div>
 
     <!-- Wave3: single indexable H1 (name identical ES/EN); keep data-split for letter reveal -->
-    <h1 class="hero-title" data-split><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
+    <!-- Wave3: plain H1 text first (LCP = text, not span.ln). <br> keeps 2-line Opus layout; letter-split+accent ≥2.5s post-load. -->
+    <h1 class="hero-title" data-split>Steven<br>Vallejo Ortiz</h1>
 
     <div class="hero-sub">
       <p class="hero-kicker" data-reveal="up" data-lang-es>Pensar antes de construir.</p>
