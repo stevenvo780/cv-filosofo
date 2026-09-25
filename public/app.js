@@ -4,13 +4,13 @@
    softChain yields harder before LCP (no rIC/idle-chunk —
    b5ff270 TBT ~8s). Letter-split animate=false ≥2.5s, gated
    past LH LCP window (interaction only). scheduleLayout =
-   rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥4.5s.
+   rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥5.5s.
    Inter/JetBrains/Cormorant-italic via fonts-deferred.css ≥2.5s
    (html.fonts-enrich) so ATF bandwidth serves Cormorant LCP.
-   Tip: chrome+layout softChain ≥2.5s; fonts-enrich 3.5s; graph ≥4.5s
-   WITH #ideasPh first-paint silhouette (Opus: no empty void). Poster makes
-   late graph Opus-safe; graph RAF under LH 4x was R2 TBT 512 (Perf 82).
-   Single H1 = #heroName only. DO NOT touch #ideasPh markup/CSS.
+   Tip: chrome+layout softChain ≥2.5s; fonts-enrich 3.5s; graph ≥5.5s
+   WITH #ideasPh first-paint silhouette (Opus: no empty void). Soft-P1 88
+   @4.5s — residual TBT/SI from graph RAF still in LH window; poster makes
+   ≥5.5s Opus-safe. Single H1 = #heroName only. DO NOT touch #ideasPh.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -563,10 +563,11 @@
    canvas#ideas stays sibling of main (Opus mobile z-order).
    #ideasPh SVG silhouette paints from first paint; graph.js hides
    it on canvas.is-ready (informatico .graph-ph pattern).
-   de874cd: graph @2.5s → mobile R1 91 / R2 82 (TBT 335/512) — graph.js
-   RAF long-tasks under 4x throttle. Poster makes ≥4.5s Opus-safe
-   (void FAIL was 4.5s WITHOUT poster). Leave TBT/TTI window clear.
-   DO NOT touch #ideasPh. Opus > Perf.
+   de874cd: graph @2.5s → R1 91 / R2 82 (TBT 335/512).
+   ed17ce1: graph @4.5s → Soft-P1 88 (residual TBT/SI — RAF still in
+   LH window under 4x). Soft tip: ≥5.5s. Poster makes late graph
+   Opus-safe (void FAIL was 4.5s WITHOUT poster). DO NOT touch #ideasPh.
+   Opus > Perf.
    ========================================================= */
 (function loadGraphPostLcp() {
   var done = false;
@@ -583,6 +584,6 @@
     else window.addEventListener("load", fn, { once: true });
   }
   afterLoad(function () {
-    setTimeout(inject, 4500);
+    setTimeout(inject, 5500);
   });
 })();
