@@ -7,9 +7,9 @@
    rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥2.5s.
    Inter/JetBrains/Cormorant-italic via fonts-deferred.css ≥2.5s
    (html.fonts-enrich) so ATF bandwidth serves Cormorant LCP.
-   Tip after 6d79f4f: chrome+layout softChain ≥2.5s post-load;
-   fonts-enrich 3.5s; graph 4.5s — cut early TBT (LH 84/89) while
-   keeping LCP on plain #heroName. Single H1 = #heroName only.
+   Tip: chrome+layout softChain ≥2.5s; fonts-enrich 3.5s; graph ≥2.5s
+   WITH #ideasPh first-paint silhouette (Opus: no empty void). 4.5s graph
+   without poster → Perf 76 + HARD_BLOCK. Single H1 = #heroName only.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -559,9 +559,10 @@
 /* =========================================================
    WAVE3 SEO/Perf: defer constellation (graph.js) post-LCP.
    canvas#ideas stays in DOM as sibling of main (not nested —
-   Opus mobile z-order). Hard floor ≥2.5s after window load;
-   tip uses 4.5s so graph.js long tasks leave the LH TBT window
-   (6d79f4f: graph bootup ~2.7s attributed / TBT 540·300).
+   Opus mobile z-order). Hard floor ≥2.5s after window load.
+   #ideasPh SVG silhouette paints from first paint; graph.js hides
+   it on canvas.is-ready (informatico .graph-ph pattern). Opus >
+   Perf: placeholder makes ≥2.5s graph safe (4.5s void FAIL 76).
    ========================================================= */
 (function loadGraphPostLcp() {
   var done = false;
@@ -578,6 +579,6 @@
     else window.addEventListener("load", fn, { once: true });
   }
   afterLoad(function () {
-    setTimeout(inject, 4500);
+    setTimeout(inject, 2500);
   });
 })();

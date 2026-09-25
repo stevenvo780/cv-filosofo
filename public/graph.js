@@ -511,6 +511,9 @@
   setScene("hero");
   if (reduce) { snap(); S.a = T.a; render(0); }
   canvas.classList.add("is-ready");
+  /* Opus: swap static #ideasPh silhouette for live canvas (never empty void) */
+  var ph = document.getElementById("ideasPh");
+  if (ph) ph.classList.add("is-hidden");
   start();
   // los rótulos griegos se redibujan con la fuente buena en cuanto carga
   if (document.fonts && document.fonts.ready && reduce) document.fonts.ready.then(function () { render(0); });

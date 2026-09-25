@@ -136,9 +136,24 @@ body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important;
     radial-gradient(40% 40% at 90% 8%, rgba(67, 181, 166, 0.10), transparent 70%),
     linear-gradient(180deg, #0a1216 0%, #070d10 100%);
 }
+.ideas-ph {
+  /* Opus HARD_BLOCK: visible constellation silhouette from first paint (not empty void)
+     until graph.js marks canvas#ideas.is-ready. Same z-layer as canvas (1), under hero (2). */
+  position: fixed; left: 0; top: 0; z-index: 1;
+  width: 100%; height: 100vh; height: 100lvh;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.9s ease, visibility 0s linear 0s;
+}
+.ideas-ph svg { width: 100%; height: 100%; display: block; }
+.ideas-ph.is-hidden {
+  visibility: hidden; opacity: 0;
+  transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+}
 .ideas {
   /* Sibling of main (not inside it): z-index 1 under main/footer (2).
-     Opus HARD_BLOCK: nesting under main buried #heroName on mobile. */
+     Opus HARD_BLOCK: nesting under main buried #heroName on mobile.
+     Opacity 0 until .is-ready — placeholder (#ideasPh) covers the void. */
   position: fixed; left: 0; top: 0; z-index: 1;
   width: 100%; height: 100vh; height: 100lvh;
   pointer-events: none;
@@ -1119,7 +1134,7 @@ html.fonts-enrich .hero-greek {
 
 /* ---------- impresión ---------- */
 @media print {
-  .site-header, .menu, .preloader, .ideas, .bg-nebula, .grain, .cursor, .scroll-progress, .marquee, .btn-row, .hero-actions { display: none !important; }
+  .site-header, .menu, .preloader, .ideas, .ideas-ph, .bg-nebula, .grain, .cursor, .scroll-progress, .marquee, .btn-row, .hero-actions { display: none !important; }
   body { background: #fff; color: #111; }
   html.js [data-reveal] { opacity: 1 !important; translate: none !important; clip-path: none !important; filter: none !important; }
 }
