@@ -3,10 +3,92 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<!-- Título + meta primarios -->
-<!-- Mejorado: título más conciso (≈55 chars), brand al frente, "Filósofo" como token diferenciador -->
 <title>Steven Vallejo · Filósofo — CV y hoja de vida | Mouseîon</title>
+
+<!-- Wave3 SEO/Perf: Cormorant preload + critical FIRST bytes (before meta wall) so H1
+     face discovers before OG/keywords. LCP = h1#heroName PLAIN TEXT. styles.css BLOCKING
+     (fetchpriority=high). softChain double-rAF — NO rIC/idle-chunk (b5ff270 TBT ~8s).
+     swap + Georgia (no optional; no webfont size-adjust). Letter-split ≥2.5s. graph ≥2.5s.
+     Opus: canvas#ideas sibling of main (not nested) + #heroName z-index above canvas.
+     Opus HARD_BLOCK: visible #ideasPh constellation silhouette from first paint (not empty
+     void) until graph.js marks canvas.is-ready — same pattern as informatico .graph-ph.
+     ATF: only Cormorant normal contended; Inter/JetBrains/italic → fonts-deferred ≥2.5s.
+     SEO P1: exactly ONE H1 (#heroName) — no dual ES/EN H1 (prod still has 2×).
+     Tip: chrome≥2.5s · fonts-enrich 3.5s · graph ≥5.5s WITH #ideasPh (Opus > Perf; Soft-P1 88@4.5s → ≥5.5s; poster OK; DO NOT touch #ideasPh). -->
+<link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
+<script>
+  /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
+  (function (d) {
+    var h = d.documentElement; h.classList.add("js");
+    try { sessionStorage.setItem("filo-intro", "1"); } catch (e) {}
+  })(document);
+</script>
+<style id="critical-hero">
+  /* ATF critical: H1 + hero + header reserve. Cormorant swap; Georgia stack (no webfont size-adjust). */
+  @font-face {
+    font-family: "Cormorant Garamond Fallback";
+    src: local("Georgia"), local("Times New Roman"), local("Times"), local("Noto Serif"), local("DejaVu Serif");
+    size-adjust: 103%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+  }
+  @font-face {
+    font-family: "Cormorant Garamond";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
+  }
+  html, body { margin: 0; background: #070d10; color: #e8e0d4; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .preloader { display: none !important; }
+  .site-header {
+    position: fixed; inset: 0 0 auto 0; z-index: 60; height: 72px;
+  }
+  .hero {
+    position: relative; z-index: 2; min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column;
+    padding: calc(72px + 1.5rem) clamp(1rem, 4vw, 3.5rem) 1.75rem;
+    max-width: 1600px; margin-inline: auto;
+  }
+  .hero-inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .hero-title {
+    position: relative; z-index: 2;
+    margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
+    font-family: "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(3.6rem, 11.2vw, 13rem);
+    line-height: 0.84;
+    letter-spacing: -0.045em;
+    color: #e8e0d4;
+    /* LCP: no soft glow — cheaper paint / lower renderDelay */
+    visibility: visible;
+    opacity: 1;
+  }
+  @media (max-width: 767px) {
+    .hero { padding-top: calc(72px + 38vh); }
+    .hero-inner { justify-content: flex-end; }
+    .hero-title { margin-top: 1rem; font-size: clamp(3.3rem, 16.5vw, 5rem); }
+  }
+  body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important; }
+  /* Opus: canvas stays invisible until graph boots; #ideasPh fills the void from first paint */
+  .ideas { opacity: 0; pointer-events: none; }
+  .ideas-ph {
+    position: fixed; left: 0; top: 0; z-index: 1;
+    width: 100%; height: 100vh; height: 100lvh;
+    pointer-events: none; display: block; opacity: 1;
+  }
+  .ideas-ph svg { width: 100%; height: 100%; display: block; }
+  .ideas-ph.is-hidden { visibility: hidden; opacity: 0; }
+  html.js .hero [data-reveal] { opacity: 1; translate: none; filter: none; clip-path: none; }
+</style>
+<link rel="stylesheet" href="styles.css" fetchpriority="high" />
+
 <!-- Mejorado: descripción ES más densa en keywords (≈155 chars), nombre completo + uni + Mouseîon -->
 <meta name="description" content="Steven Vallejo Ortiz — filósofo analítico (Universidad de Antioquia, Medellín). Lógica formal ejecutable, epistemología, filosofía de la mente y de la IA, ética. Creador del lenguaje ST y autor del blog Scholḗ (Mouseîon)." />
 <!-- Mejorado: keywords ampliado — agrega "filósofo colombiano", ubicación, ST, Medium -->
@@ -87,276 +169,28 @@
 <meta property="article:tag" content="Ética" />
 <meta property="article:tag" content="Mouseîon" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
 <script>
-  /* Marca JS temprano (estados iniciales de los revelados) y decide si mostrar el preloader. */
+  /* Apply ES/EN class before first paint of bilingual ATF (critical CSS keys on body.en). */
   (function (d) {
-    var h = d.documentElement; h.classList.add("js");
     try {
-      var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!rm && !sessionStorage.getItem("filo-intro")) h.classList.add("intro-pending");
+      var q = new URLSearchParams(location.search).get("lang");
+      if (q !== "en" && q !== "es") {
+        if (/\/en(\/|$|\.html)/.test(location.pathname)) q = "en";
+        else { try { q = localStorage.getItem("cv-filo-lang"); } catch (e) { q = null; } }
+      }
+      if (q === "en") d.body.classList.add("en");
     } catch (e) {}
   })(document);
 </script>
-<link rel="stylesheet" href="styles.css" />
-
-<!-- JSON-LD — datos estructurados (5 scripts + 1 graph) -->
-<!-- 1) Person — sujeto del CV -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": "https://filosofo.stevenvallejo.com/#person",
-  "name": "Steven Vallejo Ortiz",
-  "alternateName": ["Steven Vallejo", "Steven", "Stv"],
-  "givenName": "Steven",
-  "familyName": "Vallejo Ortiz",
-  "additionalName": "Steven Vallejo",
-  "jobTitle": ["Philosopher", "Logician", "Filósofo", "Lógico"],
-  "description": "Philosopher of analytic training (Universidad de Antioquia, Medellín) working in formal and symbolic logic, epistemology, philosophy of mind and of artificial intelligence, and ethics. Author of ST, an executable formal-logic language, and of the blog Scholḗ.",
-  "url": "https://filosofo.stevenvallejo.com/",
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://filosofo.stevenvallejo.com/og.png",
-    "width": 1200,
-    "height": 630
-  },
-  "email": "mailto:stevenvallejo780@gmail.com",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "email": "mailto:stevenvallejo780@gmail.com",
-    "contactType": "personal",
-    "availableLanguage": ["Spanish", "English"]
-  },
-  "homeLocation": {
-    "@type": "Place",
-    "name": "Medellín, Antioquia, Colombia",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Medellín",
-      "addressRegion": "Antioquia",
-      "addressCountry": "CO"
-    }
-  },
-  "nationality": { "@type": "Country", "name": "Colombia" },
-  "alumniOf": [
-    {
-      "@type": "CollegeOrUniversity",
-      "@id": "https://www.udea.edu.co/#org",
-      "name": "Universidad de Antioquia",
-      "sameAs": "https://www.udea.edu.co/",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Medellín",
-        "addressRegion": "Antioquia",
-        "addressCountry": "CO"
-      }
-    }
-  ],
-  "affiliation": [
-    {
-      "@type": "Organization",
-      "@id": "https://stevenvallejo.com/#mouseion",
-      "name": "Mouseîon",
-      "roleName": "Founder"
-    }
-  ],
-  "knowsLanguage": [
-    { "@type": "Language", "name": "Spanish", "alternateName": "es" },
-    { "@type": "Language", "name": "English", "alternateName": "en" }
-  ],
-  "knowsAbout": [
-    "Formal logic", "Symbolic logic", "Analytic philosophy",
-    "Epistemology", "Philosophy of mind", "Philosophy of artificial intelligence",
-    "Ethics", "Argumentation", "Rhetoric",
-    "Plato", "Gorgias", "Philosophy of language",
-    "Type theory", "SAT solving", "Executable logic",
-    "Emergence", "Complex systems", "Logic programming",
-    "Mouseîon", "Scholḗ", "ST"
-  ],
-  "hasOccupation": [
-    {
-      "@type": "Occupation",
-      "name": "Philosopher",
-      "occupationLocation": { "@type": "City", "name": "Medellín" },
-      "skills": "Formal logic, analytic philosophy, epistemology, philosophy of mind, philosophy of AI, ethics"
-    },
-    {
-      "@type": "Occupation",
-      "name": "Logician",
-      "skills": "SAT solving, type theory, executable logic, symbolic logic, formal logic"
-    }
-  ],
-  "sameAs": [
-    "https://stevenvallejo.com",
-    "https://filosofo.stevenvallejo.com",
-    "https://informatico.stevenvallejo.com",
-    "https://schole.stevenvallejo.com",
-    "https://github.com/stevenvo780",
-    "https://www.linkedin.com/in/steven-vallejo",
-    "https://medium.com/@stevenvallejo780"
-  ],
-  "mainEntityOfPage": {
-    "@type": "WebSite",
-    "@id": "https://filosofo.stevenvallejo.com/#website"
-  },
-  "creator": [
-    { "@id": "https://filosofo.stevenvallejo.com/#work-st" },
-    { "@id": "https://filosofo.stevenvallejo.com/#work-autologic" },
-    { "@id": "https://filosofo.stevenvallejo.com/#work-agora" }
-  ]
-}
-</script>
-
-<!-- 2) Organization — Mouseîon (la marca paraguas) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["Organization", "Brand"],
-  "@id": "https://stevenvallejo.com/#mouseion",
-  "name": "Mouseîon",
-  "alternateName": "Mouseion",
-  "description": "Mouseîon es el ecosistema personal de Steven Vallejo Ortiz: una red de sitios, productos y obra escrita en torno a la filosofía, la lógica, el software y el arte de construir.",
-  "url": "https://stevenvallejo.com",
-  "logo": {
-    "@type": "ImageObject",
-    "url": "https://stevenvallejo.com/og.png"
-  },
-  "image": "https://stevenvallejo.com/og.png",
-  "founder": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-  "foundingDate": "2022",
-  "foundingLocation": { "@type": "Place", "name": "Medellín, Colombia" },
-  "areaServed": "Worldwide",
-  "knowsLanguage": ["es", "en"],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "email": "mailto:stevenvallejo780@gmail.com",
-    "contactType": "customer support",
-    "availableLanguage": ["Spanish", "English"]
-  },
-  "sameAs": [
-    "https://stevenvallejo.com",
-    "https://github.com/stevenvo780",
-    "https://medium.com/@stevenvallejo780"
-  ]
-}
-</script>
-
-<!-- 3) WebSite — este CV -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": "https://filosofo.stevenvallejo.com/#website",
-  "name": "Steven Vallejo · CV Filósofo",
-  "alternateName": "CV Filósofo — Mouseîon",
-  "url": "https://filosofo.stevenvallejo.com/",
-  "description": "Hoja de vida filosófica de Steven Vallejo Ortiz (Mouseîon). Filósofo analítico, lógico formal, autor de ST y del blog Scholḗ.",
-  "inLanguage": ["es-ES", "en-US"],
-  "isPartOf": { "@id": "https://stevenvallejo.com/#mouseion" },
-  "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
-  "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-  "copyrightHolder": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-  "about": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-  "keywords": "Steven Vallejo, filósofo, lógica formal, Mouseîon, ST, Scholḗ, epistemología, ética, Medellín"
-}
-</script>
-
-<!-- 4) BreadcrumbList — navegabilidad de la red -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "@id": "https://filosofo.stevenvallejo.com/#breadcrumb",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Mouseîon", "item": "https://stevenvallejo.com/" },
-    { "@type": "ListItem", "position": 2, "name": "CV Filósofo", "item": "https://filosofo.stevenvallejo.com/" },
-    { "@type": "ListItem", "position": 3, "name": "Blog Scholḗ", "item": "https://schole.stevenvallejo.com/" },
-    { "@type": "ListItem", "position": 4, "name": "CV Informático", "item": "https://informatico.stevenvallejo.com/" }
-  ]
-}
-</script>
-
-<!-- 5) CreativeWorks — obras principales del autor -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": ["SoftwareSourceCode", "ProgrammingLanguage"],
-      "@id": "https://filosofo.stevenvallejo.com/#work-st",
-      "name": "ST",
-      "alternateName": "ST Language",
-      "description": "ST es un lenguaje de programación para lógica formal ejecutable: basado en SAT, con teoría de tipos, semántica y solvers, diseñado por Steven Vallejo Ortiz como artefacto filosófico y herramienta de razonamiento.",
-      "url": "https://github.com/stevenvo780/st",
-      "codeRepository": "https://github.com/stevenvo780/st",
-      "programmingLanguage": "ST",
-      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
-      "keywords": "ST, lógica formal ejecutable, type theory, SAT, formal logic, executable logic",
-      "inLanguage": "en"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://filosofo.stevenvallejo.com/#work-autologic",
-      "name": "auto.logic",
-      "description": "auto.logic: motor / herramienta de automatización lógica vinculada al lenguaje ST, explorando decisiones formales ejecutables.",
-      "url": "https://github.com/stevenvo780/auto-logic",
-      "codeRepository": "https://github.com/stevenvo780/auto-logic",
-      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
-      "keywords": "auto.logic, lógica, automatización, formal logic, automation",
-      "inLanguage": "en"
-    },
-    {
-      "@type": ["WebApplication", "WebSite"],
-      "@id": "https://filosofo.stevenvallejo.com/#work-agora",
-      "name": "Agora / Elenxos",
-      "alternateName": "Agora — plataforma académica Elenxos",
-      "description": "Agora / Elenxos: plataforma académica de Steven Vallejo Ortiz orientada a la gestión de programas filosóficos y académicos.",
-      "url": "https://elenxos.com",
-      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
-      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
-      "keywords": "Agora, Elenxos, plataforma académica, educación, filosofía",
-      "inLanguage": ["es", "en"]
-    }
-  ]
-}
-</script>
-</head>
-<body>
 <a class="skip-link" href="#main"><span data-lang-es>Saltar al contenido</span><span data-lang-en>Skip to content</span></a>
-
-<!-- ================= PRELOADER (solo 1.ª visita de la sesión, con JS) ================= -->
-<div class="preloader" aria-hidden="true">
-  <div class="preloader-inner">
-    <div class="preloader-kicker">Mouseîon · <span data-lang-es>CV filósofo</span><span data-lang-en>Philosophy CV</span></div>
-    <div class="preloader-word" lang="grc">φιλόσοφος</div>
-    <div class="preloader-meta">
-      <span>Medellín · Universidad de Antioquia</span>
-      <span class="preloader-count" id="pl-count">00</span>
-    </div>
-    <div class="preloader-bar"><span id="pl-bar"></span></div>
-  </div>
-</div>
-
-<!-- ================= CAPAS DE FONDO ================= -->
-<div class="scroll-progress" id="progress" aria-hidden="true"></div>
-<div class="bg-nebula" aria-hidden="true"></div>
-<canvas id="ideas" class="ideas" aria-hidden="true"></canvas>
-<div class="grain" aria-hidden="true"></div>
-<div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"></span></div>
 
 <!-- ================= CABECERA (siempre visible: secciones + ecosistema + WhatsApp) ================= -->
 <header class="site-header" id="header">
   <div class="site-header-inner">
     <a href="https://www.stevenvallejo.com" class="brand" aria-label="Mouseîon — Steven Vallejo">
-      <img src="isotipo.png" alt="Lemniscata Mouseîon" class="brand-logo" width="34" height="34" />
+      <img src="icon.svg" alt="Lemniscata Mouseîon" class="brand-logo" width="34" height="34" decoding="async" fetchpriority="low" />
       <span class="brand-word">
         <span class="brand-name">Steven Vallejo</span>
         <span class="brand-tag">Mouseîon · <span data-lang-es>CV filósofo</span><span data-lang-en>Philosophy CV</span></span>
@@ -396,47 +230,6 @@
   </div>
 </header>
 
-<!-- ================= MENÚ (índice + ecosistema) ================= -->
-<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Índice / Index" data-open="false" inert>
-  <div class="menu-inner">
-    <nav class="menu-sections" aria-label="Secciones / Sections">
-      <p class="menu-kicker"><span data-lang-es>Índice</span><span data-lang-en>Index</span></p>
-      <ol>
-        <li><a href="#prologo"><span class="mn">I</span><span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></a></li>
-        <li><a href="#perfil"><span class="mn">II</span><span data-lang-es>Perfil</span><span data-lang-en>Profile</span></a></li>
-        <li><a href="#areas"><span class="mn">III</span><span data-lang-es>Áreas</span><span data-lang-en>Areas</span></a></li>
-        <li><a href="#temas"><span class="mn">IV</span><span data-lang-es>Temas</span><span data-lang-en>Themes</span></a></li>
-        <li><a href="#st"><span class="mn">V</span>ST</a></li>
-        <li><a href="#influencias"><span class="mn">VI</span><span data-lang-es>Influencias</span><span data-lang-en>Influences</span></a></li>
-        <li><a href="#blog"><span class="mn">VII</span>Blog</a></li>
-        <li><a href="#formacion"><span class="mn">VIII</span><span data-lang-es>Formación</span><span data-lang-en>Education</span></a></li>
-        <li><a href="#competencias"><span class="mn">IX</span><span data-lang-es>Competencias</span><span data-lang-en>Competencies</span></a></li>
-        <li><a href="#obra"><span class="mn">X</span><span data-lang-es>Obra</span><span data-lang-en>Work</span></a></li>
-        <li><a href="#contacto"><span class="mn">XI</span><span data-lang-es>Contacto</span><span data-lang-en>Contact</span></a></li>
-      </ol>
-    </nav>
-    <div class="menu-side">
-      <p class="menu-kicker">Mouseîon</p>
-      <ul class="menu-eco">
-        <li><a href="https://www.stevenvallejo.com"><span data-lang-es>Inicio</span><span data-lang-en>Home</span> <span class="arr">↗</span></a></li>
-        <li><a href="https://informatico.stevenvallejo.com"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span> <span class="arr">↗</span></a></li>
-        <li><a href="https://schole.stevenvallejo.com">Blog Scholḗ <span class="arr">↗</span></a></li>
-        <li><a href="https://praxis.stevenvallejo.com"><span>Praxis · <span data-lang-es>Servicios</span><span data-lang-en>Services</span></span> <span class="arr">↗</span></a></li>
-        <li><a href="https://wa.me/573023954534" target="_blank" rel="noopener">WhatsApp <span class="arr">↗</span></a></li>
-        <li><a href="mailto:stevenvallejo780@gmail.com">Email <span class="arr">↗</span></a></li>
-      </ul>
-      <div class="menu-foot">
-        <div class="lang-toggle lang-toggle-lg" role="group" aria-label="Idioma / Language">
-          <button type="button" data-set-lang="es" aria-pressed="true">Español</button>
-          <button type="button" data-set-lang="en" aria-pressed="false">English</button>
-        </div>
-        <a class="menu-pdf" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
-        <a class="menu-pdf" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <main id="main" tabindex="-1">
 
 <!-- ================= HERO ================= -->
@@ -447,8 +240,10 @@
       <span class="hero-greek" lang="grc" aria-hidden="true">φιλόσοφος</span>
     </div>
 
-    <h1 class="hero-title" data-split data-lang-es><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
-    <h1 class="hero-title" data-split data-lang-en><span class="ln">Steven</span> <span class="ln"><span class="accent">Vallejo</span> Ortiz</span></h1>
+    <!-- Wave3 SEO: EXACTLY one H1 on the page = #heroName (LCP name). No ES/EN dual H1. -->
+    <!-- Static HTML — no data-split attr. Plain text first (LCP). <br> keeps 2-line Opus;
+         letter-split+accent via #heroName interaction-only ≥2.5s post-load. -->
+    <h1 class="hero-title" id="heroName">Steven<br>Vallejo Ortiz</h1>
 
     <div class="hero-sub">
       <p class="hero-kicker" data-reveal="up" data-lang-es>Pensar antes de construir.</p>
@@ -1160,6 +955,120 @@
 
 </main>
 
+<!-- ================= CAPAS DE FONDO (siblings of main; z-index under content) ================= -->
+<div class="scroll-progress" id="progress" aria-hidden="true"></div>
+<div class="bg-nebula" aria-hidden="true"></div>
+<!-- Opus: static constellation preview (first paint) until canvas#ideas.is-ready — not empty void -->
+<div class="ideas-ph" id="ideasPh" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="presentation">
+    <defs>
+      <radialGradient id="ideasPhFog" cx="52%" cy="44%" r="42%">
+        <stop offset="0%" stop-color="rgba(141,124,192,0.14)"/>
+        <stop offset="55%" stop-color="rgba(67,181,166,0.05)"/>
+        <stop offset="100%" stop-color="rgba(7,13,16,0)"/>
+      </radialGradient>
+    </defs>
+    <rect width="1440" height="900" fill="url(#ideasPhFog)"/>
+    <!-- faint armillary rings -->
+    <g fill="none" stroke="rgba(224,168,94,0.16)" stroke-width="1.1">
+      <ellipse cx="720" cy="400" rx="268" ry="268"/>
+      <ellipse cx="720" cy="400" rx="268" ry="118" transform="rotate(-18 720 400)"/>
+      <ellipse cx="720" cy="400" rx="268" ry="118" transform="rotate(42 720 400)"/>
+    </g>
+    <!-- constellation edges -->
+    <g fill="none" stroke-width="1">
+      <path d="M720 400 L560 286 L470 340 L520 470 L640 520 L720 400" stroke="rgba(224,168,94,0.28)"/>
+      <path d="M720 400 L860 270 L980 320 L940 450 L820 510 L720 400" stroke="rgba(67,181,166,0.24)"/>
+      <path d="M560 286 L640 200 L780 210 L860 270" stroke="rgba(141,124,192,0.22)"/>
+      <path d="M520 470 L430 560 L580 610 L700 560" stroke="rgba(217,116,74,0.22)"/>
+      <path d="M940 450 L1040 520 L960 600 L820 510" stroke="rgba(232,224,212,0.16)"/>
+      <path d="M640 200 L720 400 L700 560" stroke="rgba(224,168,94,0.14)"/>
+      <path d="M470 340 L430 560 M980 320 L1040 520" stroke="rgba(141,124,192,0.12)"/>
+    </g>
+    <!-- nodes -->
+    <g>
+      <circle cx="720" cy="400" r="5.2" fill="#fff4e0"/>
+      <circle cx="560" cy="286" r="3.4" fill="rgba(224,168,94,0.95)"/>
+      <circle cx="470" cy="340" r="2.6" fill="rgba(224,168,94,0.75)"/>
+      <circle cx="520" cy="470" r="2.8" fill="rgba(217,116,74,0.85)"/>
+      <circle cx="640" cy="520" r="2.4" fill="rgba(217,116,74,0.7)"/>
+      <circle cx="860" cy="270" r="3.4" fill="rgba(67,181,166,0.95)"/>
+      <circle cx="980" cy="320" r="2.6" fill="rgba(67,181,166,0.75)"/>
+      <circle cx="940" cy="450" r="2.8" fill="rgba(67,181,166,0.8)"/>
+      <circle cx="820" cy="510" r="2.4" fill="rgba(232,224,212,0.7)"/>
+      <circle cx="640" cy="200" r="3.2" fill="rgba(141,124,192,0.95)"/>
+      <circle cx="780" cy="210" r="2.4" fill="rgba(141,124,192,0.75)"/>
+      <circle cx="430" cy="560" r="2.6" fill="rgba(217,116,74,0.8)"/>
+      <circle cx="580" cy="610" r="2.2" fill="rgba(232,224,212,0.65)"/>
+      <circle cx="700" cy="560" r="2.4" fill="rgba(224,168,94,0.7)"/>
+      <circle cx="1040" cy="520" r="2.6" fill="rgba(141,124,192,0.75)"/>
+      <circle cx="960" cy="600" r="2.2" fill="rgba(232,224,212,0.6)"/>
+      <!-- ambient dust -->
+      <circle cx="310" cy="180" r="1.2" fill="rgba(232,224,212,0.35)"/>
+      <circle cx="1180" cy="240" r="1.3" fill="rgba(232,224,212,0.32)"/>
+      <circle cx="240" cy="480" r="1.1" fill="rgba(224,168,94,0.3)"/>
+      <circle cx="1280" cy="560" r="1.2" fill="rgba(67,181,166,0.28)"/>
+      <circle cx="360" cy="720" r="1.1" fill="rgba(141,124,192,0.28)"/>
+      <circle cx="1100" cy="140" r="1.0" fill="rgba(232,224,212,0.28)"/>
+      <circle cx="180" cy="320" r="1.0" fill="rgba(224,168,94,0.25)"/>
+      <circle cx="1320" cy="380" r="1.1" fill="rgba(67,181,166,0.25)"/>
+    </g>
+    <!-- sparse Greek labels (silhouette, not live graph) -->
+    <g font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="rgba(232,224,212,0.42)" text-anchor="middle">
+      <text x="720" y="388">φιλοσοφία</text>
+      <text x="560" y="274" fill="rgba(224,168,94,0.55)">λόγος</text>
+      <text x="860" y="258" fill="rgba(67,181,166,0.55)">νοῦς</text>
+      <text x="640" y="188" fill="rgba(141,124,192,0.55)">ἐπιστήμη</text>
+      <text x="430" y="548" fill="rgba(217,116,74,0.5)">ἦθος</text>
+      <text x="1040" y="508" fill="rgba(141,124,192,0.45)">κόσμος</text>
+    </g>
+  </svg>
+</div>
+<canvas id="ideas" class="ideas" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"></span></div>
+
+<!-- ================= MENÚ (índice + ecosistema) ================= -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Índice / Index" data-open="false" inert>
+  <div class="menu-inner">
+    <nav class="menu-sections" aria-label="Secciones / Sections">
+      <p class="menu-kicker"><span data-lang-es>Índice</span><span data-lang-en>Index</span></p>
+      <ol>
+        <li><a href="#prologo"><span class="mn">I</span><span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></a></li>
+        <li><a href="#perfil"><span class="mn">II</span><span data-lang-es>Perfil</span><span data-lang-en>Profile</span></a></li>
+        <li><a href="#areas"><span class="mn">III</span><span data-lang-es>Áreas</span><span data-lang-en>Areas</span></a></li>
+        <li><a href="#temas"><span class="mn">IV</span><span data-lang-es>Temas</span><span data-lang-en>Themes</span></a></li>
+        <li><a href="#st"><span class="mn">V</span>ST</a></li>
+        <li><a href="#influencias"><span class="mn">VI</span><span data-lang-es>Influencias</span><span data-lang-en>Influences</span></a></li>
+        <li><a href="#blog"><span class="mn">VII</span>Blog</a></li>
+        <li><a href="#formacion"><span class="mn">VIII</span><span data-lang-es>Formación</span><span data-lang-en>Education</span></a></li>
+        <li><a href="#competencias"><span class="mn">IX</span><span data-lang-es>Competencias</span><span data-lang-en>Competencies</span></a></li>
+        <li><a href="#obra"><span class="mn">X</span><span data-lang-es>Obra</span><span data-lang-en>Work</span></a></li>
+        <li><a href="#contacto"><span class="mn">XI</span><span data-lang-es>Contacto</span><span data-lang-en>Contact</span></a></li>
+      </ol>
+    </nav>
+    <div class="menu-side">
+      <p class="menu-kicker">Mouseîon</p>
+      <ul class="menu-eco">
+        <li><a href="https://www.stevenvallejo.com"><span data-lang-es>Inicio</span><span data-lang-en>Home</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://informatico.stevenvallejo.com"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://schole.stevenvallejo.com">Blog Scholḗ <span class="arr">↗</span></a></li>
+        <li><a href="https://praxis.stevenvallejo.com"><span>Praxis · <span data-lang-es>Servicios</span><span data-lang-en>Services</span></span> <span class="arr">↗</span></a></li>
+        <li><a href="https://wa.me/573023954534" target="_blank" rel="noopener">WhatsApp <span class="arr">↗</span></a></li>
+        <li><a href="mailto:stevenvallejo780@gmail.com">Email <span class="arr">↗</span></a></li>
+      </ul>
+      <div class="menu-foot">
+        <div class="lang-toggle lang-toggle-lg" role="group" aria-label="Idioma / Language">
+          <button type="button" data-set-lang="es" aria-pressed="true">Español</button>
+          <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+        </div>
+        <a class="menu-pdf" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
+        <a class="menu-pdf" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="container">
     <p class="footer-word" lang="grc" aria-hidden="true">φιλοσοφία</p>
@@ -1180,7 +1089,235 @@
   </div>
 </footer>
 
-<script src="graph.js" defer></script>
+<!-- JSON-LD moved post-hero (mobile LCP: ~9KB earlier H1 bytes) -->
+<!-- JSON-LD — datos estructurados (5 scripts + 1 graph) -->
+<!-- 1) Person — sujeto del CV -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://filosofo.stevenvallejo.com/#person",
+  "name": "Steven Vallejo Ortiz",
+  "alternateName": ["Steven Vallejo", "Steven", "Stv"],
+  "givenName": "Steven",
+  "familyName": "Vallejo Ortiz",
+  "additionalName": "Steven Vallejo",
+  "jobTitle": ["Philosopher", "Logician", "Filósofo", "Lógico"],
+  "description": "Philosopher of analytic training (Universidad de Antioquia, Medellín) working in formal and symbolic logic, epistemology, philosophy of mind and of artificial intelligence, and ethics. Author of ST, an executable formal-logic language, and of the blog Scholḗ.",
+  "url": "https://filosofo.stevenvallejo.com/",
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://filosofo.stevenvallejo.com/og.png",
+    "width": 1200,
+    "height": 630
+  },
+  "email": "mailto:stevenvallejo780@gmail.com",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "mailto:stevenvallejo780@gmail.com",
+    "contactType": "personal",
+    "availableLanguage": ["Spanish", "English"]
+  },
+  "homeLocation": {
+    "@type": "Place",
+    "name": "Medellín, Antioquia, Colombia",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Medellín",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
+  },
+  "nationality": { "@type": "Country", "name": "Colombia" },
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "@id": "https://www.udea.edu.co/#org",
+      "name": "Universidad de Antioquia",
+      "sameAs": "https://www.udea.edu.co/",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Medellín",
+        "addressRegion": "Antioquia",
+        "addressCountry": "CO"
+      }
+    }
+  ],
+  "affiliation": [
+    {
+      "@type": "Organization",
+      "@id": "https://stevenvallejo.com/#mouseion",
+      "name": "Mouseîon",
+      "roleName": "Founder"
+    }
+  ],
+  "knowsLanguage": [
+    { "@type": "Language", "name": "Spanish", "alternateName": "es" },
+    { "@type": "Language", "name": "English", "alternateName": "en" }
+  ],
+  "knowsAbout": [
+    "Formal logic", "Symbolic logic", "Analytic philosophy",
+    "Epistemology", "Philosophy of mind", "Philosophy of artificial intelligence",
+    "Ethics", "Argumentation", "Rhetoric",
+    "Plato", "Gorgias", "Philosophy of language",
+    "Type theory", "SAT solving", "Executable logic",
+    "Emergence", "Complex systems", "Logic programming",
+    "Mouseîon", "Scholḗ", "ST"
+  ],
+  "hasOccupation": [
+    {
+      "@type": "Occupation",
+      "name": "Philosopher",
+      "occupationLocation": { "@type": "City", "name": "Medellín" },
+      "skills": "Formal logic, analytic philosophy, epistemology, philosophy of mind, philosophy of AI, ethics"
+    },
+    {
+      "@type": "Occupation",
+      "name": "Logician",
+      "skills": "SAT solving, type theory, executable logic, symbolic logic, formal logic"
+    }
+  ],
+  "sameAs": [
+    "https://stevenvallejo.com",
+    "https://filosofo.stevenvallejo.com",
+    "https://informatico.stevenvallejo.com",
+    "https://schole.stevenvallejo.com",
+    "https://github.com/stevenvo780",
+    "https://www.linkedin.com/in/steven-vallejo",
+    "https://medium.com/@stevenvallejo780"
+  ],
+  "mainEntityOfPage": {
+    "@type": "WebSite",
+    "@id": "https://filosofo.stevenvallejo.com/#website"
+  },
+  "creator": [
+    { "@id": "https://filosofo.stevenvallejo.com/#work-st" },
+    { "@id": "https://filosofo.stevenvallejo.com/#work-autologic" },
+    { "@id": "https://filosofo.stevenvallejo.com/#work-agora" }
+  ]
+}
+</script>
+
+<!-- 2) Organization — Mouseîon (la marca paraguas) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["Organization", "Brand"],
+  "@id": "https://stevenvallejo.com/#mouseion",
+  "name": "Mouseîon",
+  "alternateName": "Mouseion",
+  "description": "Mouseîon es el ecosistema personal de Steven Vallejo Ortiz: una red de sitios, productos y obra escrita en torno a la filosofía, la lógica, el software y el arte de construir.",
+  "url": "https://stevenvallejo.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://stevenvallejo.com/og.png"
+  },
+  "image": "https://stevenvallejo.com/og.png",
+  "founder": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+  "foundingDate": "2022",
+  "foundingLocation": { "@type": "Place", "name": "Medellín, Colombia" },
+  "areaServed": "Worldwide",
+  "knowsLanguage": ["es", "en"],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "mailto:stevenvallejo780@gmail.com",
+    "contactType": "customer support",
+    "availableLanguage": ["Spanish", "English"]
+  },
+  "sameAs": [
+    "https://stevenvallejo.com",
+    "https://github.com/stevenvo780",
+    "https://medium.com/@stevenvallejo780"
+  ]
+}
+</script>
+
+<!-- 3) WebSite — este CV -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://filosofo.stevenvallejo.com/#website",
+  "name": "Steven Vallejo · CV Filósofo",
+  "alternateName": "CV Filósofo — Mouseîon",
+  "url": "https://filosofo.stevenvallejo.com/",
+  "description": "Hoja de vida filosófica de Steven Vallejo Ortiz (Mouseîon). Filósofo analítico, lógico formal, autor de ST y del blog Scholḗ.",
+  "inLanguage": ["es-ES", "en-US"],
+  "isPartOf": { "@id": "https://stevenvallejo.com/#mouseion" },
+  "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
+  "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+  "copyrightHolder": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+  "about": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+  "keywords": "Steven Vallejo, filósofo, lógica formal, Mouseîon, ST, Scholḗ, epistemología, ética, Medellín"
+}
+</script>
+
+<!-- 4) BreadcrumbList — navegabilidad de la red -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://filosofo.stevenvallejo.com/#breadcrumb",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Mouseîon", "item": "https://stevenvallejo.com/" },
+    { "@type": "ListItem", "position": 2, "name": "CV Filósofo", "item": "https://filosofo.stevenvallejo.com/" },
+    { "@type": "ListItem", "position": 3, "name": "Blog Scholḗ", "item": "https://schole.stevenvallejo.com/" },
+    { "@type": "ListItem", "position": 4, "name": "CV Informático", "item": "https://informatico.stevenvallejo.com/" }
+  ]
+}
+</script>
+
+<!-- 5) CreativeWorks — obras principales del autor -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["SoftwareSourceCode", "ProgrammingLanguage"],
+      "@id": "https://filosofo.stevenvallejo.com/#work-st",
+      "name": "ST",
+      "alternateName": "ST Language",
+      "description": "ST es un lenguaje de programación para lógica formal ejecutable: basado en SAT, con teoría de tipos, semántica y solvers, diseñado por Steven Vallejo Ortiz como artefacto filosófico y herramienta de razonamiento.",
+      "url": "https://github.com/stevenvo780/st",
+      "codeRepository": "https://github.com/stevenvo780/st",
+      "programmingLanguage": "ST",
+      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
+      "keywords": "ST, lógica formal ejecutable, type theory, SAT, formal logic, executable logic",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://filosofo.stevenvallejo.com/#work-autologic",
+      "name": "auto.logic",
+      "description": "auto.logic: motor / herramienta de automatización lógica vinculada al lenguaje ST, explorando decisiones formales ejecutables.",
+      "url": "https://github.com/stevenvo780/auto-logic",
+      "codeRepository": "https://github.com/stevenvo780/auto-logic",
+      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
+      "keywords": "auto.logic, lógica, automatización, formal logic, automation",
+      "inLanguage": "en"
+    },
+    {
+      "@type": ["WebApplication", "WebSite"],
+      "@id": "https://filosofo.stevenvallejo.com/#work-agora",
+      "name": "Agora / Elenxos",
+      "alternateName": "Agora — plataforma académica Elenxos",
+      "description": "Agora / Elenxos: plataforma académica de Steven Vallejo Ortiz orientada a la gestión de programas filosóficos y académicos.",
+      "url": "https://elenxos.com",
+      "creator": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "author": { "@id": "https://filosofo.stevenvallejo.com/#person" },
+      "publisher": { "@id": "https://stevenvallejo.com/#mouseion" },
+      "keywords": "Agora, Elenxos, plataforma académica, educación, filosofía",
+      "inLanguage": ["es", "en"]
+    }
+  ]
+}
+</script>
+
+<!-- Wave3: graph.js injected ≥5.5s post-load from app.js; #ideasPh fills void until canvas.is-ready (DO NOT touch #ideasPh) -->
 <script src="app.js" defer></script>
 </body>
 </html>

@@ -16,7 +16,10 @@
 
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var W = 0, H = 0, DPR = 1, mobile = false;
-  var quality = 1; // 1 = completo, 0 = reducido (se ajusta solo)
+  /* Mobile starts reduced: full quality on mid-tier LH was a multi-second
+     long task (b5ff270 TBT ~8s outlier). Desktop keeps full quality. */
+  var quality = (typeof window !== "undefined" && window.matchMedia &&
+    window.matchMedia("(max-width: 767px), (pointer: coarse)").matches) ? 0 : 1;
 
   /* ---------- Paleta ---------- */
   var C = {
@@ -504,11 +507,26 @@
     }
   };
 
-  resize();
-  setScene("hero");
-  if (reduce) { snap(); S.a = T.a; render(0); }
-  canvas.classList.add("is-ready");
-  start();
-  // los rótulos griegos se redibujan con la fuente buena en cuanto carga
-  if (document.fonts && document.fonts.ready && reduce) document.fonts.ready.then(function () { render(0); });
+  /* Soft-yield boot — NOT rIC (b5ff270 TBT ~8s). Sync resize+build+start
+     coalesced under LH 4x into 100–320ms graph.js long tasks (de874cd R2).
+     #ideasPh stays visible until is-ready — never empty void. */
+  function softYield(fn) {
+    requestAnimationFrame(function () { setTimeout(fn, 0); });
+  }
+  softYield(function () {
+    resize();
+    setScene("hero");
+    softYield(function () {
+      if (reduce) { snap(); S.a = T.a; render(0); }
+      canvas.classList.add("is-ready");
+      /* Opus: swap static #ideasPh silhouette for live canvas (never empty void).
+         is-ready + hide ph + start stay atomic — no mid-swap empty frame. */
+      var ph = document.getElementById("ideasPh");
+      if (ph) ph.classList.add("is-hidden");
+      start();
+      if (document.fonts && document.fonts.ready && reduce) {
+        document.fonts.ready.then(function () { render(0); });
+      }
+    });
+  });
 })();
