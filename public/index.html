@@ -89,7 +89,7 @@
 
 <!-- Wave3 SEO/Perf: self-host Cormorant/Inter/JetBrains (latin) — same faces, no render-blocking googleapis.
      EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS).
-     LCP = h1.hero-title: preload H1 face first; no covering preloader (intro-pending skipped). -->
+     LCP = h1.hero-title: preload H1 face; critical font-size; no covering preloader (intro-pending skipped). -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="fonts/cormorant-garamond-italic-latin.woff2" as="font" type="font/woff2" crossorigin />
 <script>
@@ -100,8 +100,15 @@
   })(document);
 </script>
 <style>
-  /* Critical: H1 paints complete/visible before any letter-split polish */
-  .hero-title { font-family: "Cormorant Garamond", "EB Garamond", Georgia, serif; font-weight: 500; visibility: visible; opacity: 1; }
+  /* Critical: H1 size before styles.css so first paint has correct LCP metrics; Cormorant stays optional */
+  .hero-title {
+    font-family: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(3.6rem, 11.2vw, 13rem);
+    line-height: 0.84;
+    visibility: visible;
+    opacity: 1;
+  }
   .hero-title .ln { display: block; }
 </style>
 <link rel="stylesheet" href="styles.css" />
