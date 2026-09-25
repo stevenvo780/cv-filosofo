@@ -530,8 +530,8 @@
 
 /* =========================================================
    WAVE3 SEO/Perf: defer constellation (graph.js) post-LCP.
-   canvas#ideas stays in DOM; early-return guard in graph.js
-   requires the canvas. Hard floor 2.5s after window load.
+   canvas#ideas stays in DOM as sibling of main (not nested —
+   Opus mobile z-order). Hard floor 2.5s after window load.
    ========================================================= */
 (function loadGraphPostLcp() {
   var done = false;

@@ -8,7 +8,8 @@
 <!-- Wave3 SEO/Perf: Cormorant preload + critical FIRST bytes (before meta wall) so H1
      face discovers before OG/keywords. LCP = h1#heroName PLAIN TEXT. styles.css BLOCKING
      (fetchpriority=high). softChain double-rAF — NO rIC/idle-chunk (b5ff270 TBT ~8s).
-     swap + Georgia (no optional; no webfont size-adjust). Letter-split ≥2.5s. graph ≥2.5s. -->
+     swap + Georgia (no optional; no webfont size-adjust). Letter-split ≥2.5s. graph ≥2.5s.
+     Opus: canvas#ideas sibling of main (not nested) + #heroName z-index above canvas. -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
@@ -45,13 +46,14 @@
     position: fixed; inset: 0 0 auto 0; z-index: 60; height: 72px;
   }
   .hero {
-    position: relative; min-height: 100vh; min-height: 100svh;
+    position: relative; z-index: 2; min-height: 100vh; min-height: 100svh;
     display: flex; flex-direction: column;
     padding: calc(72px + 1.5rem) clamp(1rem, 4vw, 3.5rem) 1.75rem;
     max-width: 1600px; margin-inline: auto;
   }
-  .hero-inner { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .hero-inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; justify-content: center; }
   .hero-title {
+    position: relative; z-index: 2;
     margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
     font-family: "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
     font-weight: 500;
@@ -257,54 +259,6 @@
     </div>
   </div>
 </section>
-
-<!-- ================= CAPAS DE FONDO ================= -->
-<div class="scroll-progress" id="progress" aria-hidden="true"></div>
-<div class="bg-nebula" aria-hidden="true"></div>
-<canvas id="ideas" class="ideas" aria-hidden="true"></canvas>
-<div class="grain" aria-hidden="true"></div>
-<div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"></span></div>
-
-<!-- ================= MENÚ (índice + ecosistema) ================= -->
-<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Índice / Index" data-open="false" inert>
-  <div class="menu-inner">
-    <nav class="menu-sections" aria-label="Secciones / Sections">
-      <p class="menu-kicker"><span data-lang-es>Índice</span><span data-lang-en>Index</span></p>
-      <ol>
-        <li><a href="#prologo"><span class="mn">I</span><span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></a></li>
-        <li><a href="#perfil"><span class="mn">II</span><span data-lang-es>Perfil</span><span data-lang-en>Profile</span></a></li>
-        <li><a href="#areas"><span class="mn">III</span><span data-lang-es>Áreas</span><span data-lang-en>Areas</span></a></li>
-        <li><a href="#temas"><span class="mn">IV</span><span data-lang-es>Temas</span><span data-lang-en>Themes</span></a></li>
-        <li><a href="#st"><span class="mn">V</span>ST</a></li>
-        <li><a href="#influencias"><span class="mn">VI</span><span data-lang-es>Influencias</span><span data-lang-en>Influences</span></a></li>
-        <li><a href="#blog"><span class="mn">VII</span>Blog</a></li>
-        <li><a href="#formacion"><span class="mn">VIII</span><span data-lang-es>Formación</span><span data-lang-en>Education</span></a></li>
-        <li><a href="#competencias"><span class="mn">IX</span><span data-lang-es>Competencias</span><span data-lang-en>Competencies</span></a></li>
-        <li><a href="#obra"><span class="mn">X</span><span data-lang-es>Obra</span><span data-lang-en>Work</span></a></li>
-        <li><a href="#contacto"><span class="mn">XI</span><span data-lang-es>Contacto</span><span data-lang-en>Contact</span></a></li>
-      </ol>
-    </nav>
-    <div class="menu-side">
-      <p class="menu-kicker">Mouseîon</p>
-      <ul class="menu-eco">
-        <li><a href="https://www.stevenvallejo.com"><span data-lang-es>Inicio</span><span data-lang-en>Home</span> <span class="arr">↗</span></a></li>
-        <li><a href="https://informatico.stevenvallejo.com"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span> <span class="arr">↗</span></a></li>
-        <li><a href="https://schole.stevenvallejo.com">Blog Scholḗ <span class="arr">↗</span></a></li>
-        <li><a href="https://praxis.stevenvallejo.com"><span>Praxis · <span data-lang-es>Servicios</span><span data-lang-en>Services</span></span> <span class="arr">↗</span></a></li>
-        <li><a href="https://wa.me/573023954534" target="_blank" rel="noopener">WhatsApp <span class="arr">↗</span></a></li>
-        <li><a href="mailto:stevenvallejo780@gmail.com">Email <span class="arr">↗</span></a></li>
-      </ul>
-      <div class="menu-foot">
-        <div class="lang-toggle lang-toggle-lg" role="group" aria-label="Idioma / Language">
-          <button type="button" data-set-lang="es" aria-pressed="true">Español</button>
-          <button type="button" data-set-lang="en" aria-pressed="false">English</button>
-        </div>
-        <a class="menu-pdf" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
-        <a class="menu-pdf" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ================= § I PRÓLOGO ================= -->
 <section class="section manifesto" id="prologo" data-scene="prologo">
@@ -986,6 +940,54 @@
 </section>
 
 </main>
+
+<!-- ================= CAPAS DE FONDO (siblings of main; z-index under content) ================= -->
+<div class="scroll-progress" id="progress" aria-hidden="true"></div>
+<div class="bg-nebula" aria-hidden="true"></div>
+<canvas id="ideas" class="ideas" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"></span></div>
+
+<!-- ================= MENÚ (índice + ecosistema) ================= -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Índice / Index" data-open="false" inert>
+  <div class="menu-inner">
+    <nav class="menu-sections" aria-label="Secciones / Sections">
+      <p class="menu-kicker"><span data-lang-es>Índice</span><span data-lang-en>Index</span></p>
+      <ol>
+        <li><a href="#prologo"><span class="mn">I</span><span data-lang-es>Prólogo</span><span data-lang-en>Prologue</span></a></li>
+        <li><a href="#perfil"><span class="mn">II</span><span data-lang-es>Perfil</span><span data-lang-en>Profile</span></a></li>
+        <li><a href="#areas"><span class="mn">III</span><span data-lang-es>Áreas</span><span data-lang-en>Areas</span></a></li>
+        <li><a href="#temas"><span class="mn">IV</span><span data-lang-es>Temas</span><span data-lang-en>Themes</span></a></li>
+        <li><a href="#st"><span class="mn">V</span>ST</a></li>
+        <li><a href="#influencias"><span class="mn">VI</span><span data-lang-es>Influencias</span><span data-lang-en>Influences</span></a></li>
+        <li><a href="#blog"><span class="mn">VII</span>Blog</a></li>
+        <li><a href="#formacion"><span class="mn">VIII</span><span data-lang-es>Formación</span><span data-lang-en>Education</span></a></li>
+        <li><a href="#competencias"><span class="mn">IX</span><span data-lang-es>Competencias</span><span data-lang-en>Competencies</span></a></li>
+        <li><a href="#obra"><span class="mn">X</span><span data-lang-es>Obra</span><span data-lang-en>Work</span></a></li>
+        <li><a href="#contacto"><span class="mn">XI</span><span data-lang-es>Contacto</span><span data-lang-en>Contact</span></a></li>
+      </ol>
+    </nav>
+    <div class="menu-side">
+      <p class="menu-kicker">Mouseîon</p>
+      <ul class="menu-eco">
+        <li><a href="https://www.stevenvallejo.com"><span data-lang-es>Inicio</span><span data-lang-en>Home</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://informatico.stevenvallejo.com"><span data-lang-es>CV Informático</span><span data-lang-en>Engineering CV</span> <span class="arr">↗</span></a></li>
+        <li><a href="https://schole.stevenvallejo.com">Blog Scholḗ <span class="arr">↗</span></a></li>
+        <li><a href="https://praxis.stevenvallejo.com"><span>Praxis · <span data-lang-es>Servicios</span><span data-lang-en>Services</span></span> <span class="arr">↗</span></a></li>
+        <li><a href="https://wa.me/573023954534" target="_blank" rel="noopener">WhatsApp <span class="arr">↗</span></a></li>
+        <li><a href="mailto:stevenvallejo780@gmail.com">Email <span class="arr">↗</span></a></li>
+      </ul>
+      <div class="menu-foot">
+        <div class="lang-toggle lang-toggle-lg" role="group" aria-label="Idioma / Language">
+          <button type="button" data-set-lang="es" aria-pressed="true">Español</button>
+          <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+        </div>
+        <a class="menu-pdf" href="pdf/CV_filo_es.pdf" download data-lang-es>Descargar CV (PDF · ES)</a>
+        <a class="menu-pdf" href="pdf/CV_filo_en.pdf" download data-lang-en>Download CV (PDF · EN)</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="container">

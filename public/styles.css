@@ -148,6 +148,8 @@ body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important;
     linear-gradient(180deg, #0a1216 0%, #070d10 100%);
 }
 .ideas {
+  /* Sibling of main (not inside it): z-index 1 under main/footer (2).
+     Opus HARD_BLOCK: nesting under main buried #heroName on mobile. */
   position: fixed; left: 0; top: 0; z-index: 1;
   width: 100%; height: 100vh; height: 100lvh;
   pointer-events: none;
@@ -175,6 +177,7 @@ body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important;
   transform-origin: 0 50%; transform: scaleX(0); pointer-events: none;
 }
 
+/* Capas (.ideas z:1) must be siblings of main — not descendants — or they bury content. */
 main, .site-footer { position: relative; z-index: 2; }
 main { outline: none; }
 
@@ -524,12 +527,13 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
    Hero
    ========================================================= */
 .hero {
-  position: relative; min-height: 100vh; min-height: 100svh;
+  /* z-index above canvas#ideas (belt-and-suspenders; main also z-index:2). */
+  position: relative; z-index: 2; min-height: 100vh; min-height: 100svh;
   display: flex; flex-direction: column;
   padding: calc(var(--header-h) + 1.5rem) var(--gutter) 1.75rem;
   max-width: 1600px; margin-inline: auto;
 }
-.hero-inner { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.hero-inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .eyebrow-dot {
   width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
@@ -540,6 +544,8 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
   letter-spacing: 0.06em; color: var(--gold);
 }
 .hero-title {
+  /* Opus: name must paint above canvas#ideas (mobile DOM-present-but-buried). */
+  position: relative; z-index: 2;
   margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
   font-family: var(--font-display); font-weight: 500;
   font-size: clamp(3.6rem, 11.2vw, 13rem); line-height: 0.84; letter-spacing: -0.045em;
