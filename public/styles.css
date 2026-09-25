@@ -21,27 +21,8 @@
   font-display: swap;
   src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
 }
-@font-face {
-  font-family: "Cormorant Garamond";
-  font-style: italic;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url("fonts/cormorant-garamond-italic-latin.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url("fonts/inter-latin.woff2") format("woff2");
-}
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url("fonts/jetbrains-mono-latin.woff2") format("woff2");
-}
+/* Inter / JetBrains / Cormorant-italic live in fonts-deferred.css (softChain ≥2.5s).
+   Blocking sheet keeps only Cormorant normal for #heroName LCP bandwidth. */
 
 /* =========================================================
    CV Filósofo — Steven Vallejo Ortiz
@@ -74,11 +55,19 @@
   --maxw: 1440px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  /* ATF: system body/mono — Inter/JetBrains deferred so they do not contend with Cormorant LCP. */
   --font-display: "Cormorant Garamond", "Cormorant Garamond Fallback", "EB Garamond", Georgia, serif;
-  --font-greek: "EB Garamond", "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
+  --font-greek: "Cormorant Garamond Fallback", Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Fira Code", Consolas, monospace;
+}
+/* Post-LCP face enrichment (fonts-deferred.css + this class via softChain ≥2.5s) */
+html.fonts-enrich {
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Fira Code", Consolas, monospace;
+  --font-greek: "EB Garamond", "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
 }
+
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -549,7 +538,7 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
   margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
   font-family: var(--font-display); font-weight: 500;
   font-size: clamp(3.6rem, 11.2vw, 13rem); line-height: 0.84; letter-spacing: -0.045em;
-  color: var(--text); text-shadow: 0 10px 60px rgba(5, 10, 12, 0.45);
+  color: var(--text); /* LCP: no soft glow — cheaper #heroName paint */
 }
 .hero-title .ln { display: block; }
 /* Accent may be on inline span (legacy) or on .w after post-LCP letter-split */
@@ -579,6 +568,15 @@ html.js .hero-title[data-entrance] .c {
   html.js .hero-title[data-entrance] .c { animation: none; }
 }
 
+/* ATF italic copy on Fallback until fonts-enrich (no Cormorant-italic woff2 on critical path). */
+.hero-kicker, .hero-epigraph, .hero-greek {
+  font-family: "Cormorant Garamond Fallback", Georgia, serif;
+}
+html.fonts-enrich .hero-kicker,
+html.fonts-enrich .hero-epigraph,
+html.fonts-enrich .hero-greek {
+  font-family: var(--font-display);
+}
 .hero-sub { margin-top: clamp(1.4rem, 4vh, 2.6rem); max-width: 46rem; }
 .hero-epigraph, .hero-kicker { max-width: 36rem; }
 .hero-kicker {

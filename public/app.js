@@ -5,6 +5,8 @@
    b5ff270 TBT ~8s). Letter-split animate=false ≥2.5s, gated
    past LH LCP window (interaction only). scheduleLayout =
    rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥2.5s.
+   Inter/JetBrains/Cormorant-italic via fonts-deferred.css ≥2.5s
+   (html.fonts-enrich) so ATF bandwidth serves Cormorant LCP.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -183,6 +185,20 @@
     }
     afterLoad(function () { setTimeout(fn, ms); });
   }
+  /* Enrich Inter / JetBrains / Cormorant-italic after LCP window.
+     Blocking styles.css intentionally omits those @font-face (LH R2
+     showed them as VeryHigh ATF competitors next to Cormorant). */
+  function enrichDeferredFonts() {
+    if (root.getAttribute("data-fonts-enrich") === "1") return;
+    root.setAttribute("data-fonts-enrich", "1");
+    var link = doc.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "fonts-deferred.css";
+    link.media = "all";
+    doc.head.appendChild(link);
+    root.classList.add("fonts-enrich");
+  }
+  schedulePostLcp(enrichDeferredFonts, 2500);
   /* ---------- Palabras que se iluminan (DOM wrap AFTER LCP — was major TBT) ---------- */
   var wordBlocks = [];
   function initWordBlocks() {
@@ -504,17 +520,21 @@
       softChain([
         function () {}, /* yield: let H1 paint commit */
         function () {}, /* yield: keep renderer free */
+        function () {}, /* yield: absorb Cormorant swap before chrome */
         function () {
           applyLang(initialLang());
           langBoot = false;
           var y = doc.getElementById("year");
           if (y) y.textContent = String(new Date().getFullYear());
         },
+        function () {}, /* yield after lang class */
         initCounters,
         function () {}, /* yield before heavy chrome */
+        function () {}, /* extra yield — kill R2 TBT/LCP variance */
         initChromeAndLayout,
         function () { scheduleLayout(layout); },
         function () {
+          /* Only Cormorant normal is in the ATF font set; ready → reflow tracks. */
           if (doc.fonts && doc.fonts.ready) {
             doc.fonts.ready.then(function () {
               tracks.forEach(function (t) { t.w = 0; });

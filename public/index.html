@@ -9,7 +9,8 @@
      face discovers before OG/keywords. LCP = h1#heroName PLAIN TEXT. styles.css BLOCKING
      (fetchpriority=high). softChain double-rAF — NO rIC/idle-chunk (b5ff270 TBT ~8s).
      swap + Georgia (no optional; no webfont size-adjust). Letter-split ≥2.5s. graph ≥2.5s.
-     Opus: canvas#ideas sibling of main (not nested) + #heroName z-index above canvas. -->
+     Opus: canvas#ideas sibling of main (not nested) + #heroName z-index above canvas.
+     ATF: only Cormorant normal contended; Inter/JetBrains/italic → fonts-deferred ≥2.5s. -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
@@ -37,7 +38,7 @@
   }
   html, body { margin: 0; background: #070d10; color: #e8e0d4; }
   body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 16px; line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
@@ -61,7 +62,7 @@
     line-height: 0.84;
     letter-spacing: -0.045em;
     color: #e8e0d4;
-    text-shadow: 0 10px 60px rgba(5, 10, 12, 0.45);
+    /* LCP: no soft glow — cheaper paint / lower renderDelay */
     visibility: visible;
     opacity: 1;
   }
