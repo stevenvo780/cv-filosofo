@@ -1,8 +1,10 @@
 /* =========================================================
    CV Filósofo — interacción (sin dependencias)
-   Idioma ES/EN · preloader · cabecera · índice · revelados ·
-   título por letras · palabras que se iluminan · áreas fijas ·
-   carril horizontal · cinta · contadores · cursor · escenas.
+   WAVE3 mobile tip: light sync boot; heavy DOM/IO/layout in
+   idle chunks so H1 LCP + TBT clear on mid-tier mobile.
+   Idioma ES/EN · cabecera · índice · revelados ·
+   título por letras · palabras · áreas · carril · cinta ·
+   contadores · cursor · escenas.
    ========================================================= */
 (function () {
   "use strict";
@@ -13,10 +15,28 @@
   function $$(s, c) { return Array.prototype.slice.call((c || doc).querySelectorAll(s)); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
-  /* ---------- Idioma ES (defecto) / EN ---------- */
+  function runIdle(fn, timeout) {
+    if ("requestIdleCallback" in window) requestIdleCallback(fn, { timeout: timeout || 400 });
+    else setTimeout(fn, 0);
+  }
+  function afterLoad(fn) {
+    if (doc.readyState === "complete") fn();
+    else window.addEventListener("load", fn, { once: true });
+  }
+  /* ≥2.5s post-load idle — hard floor for letter-split / graph / polish */
+  function schedulePostLcp(fn) {
+    afterLoad(function () {
+      setTimeout(function () {
+        runIdle(fn, 1200);
+      }, 2500);
+    });
+  }
+
+  /* ---------- Idioma ES (defecto) / EN — LIGHT (sync, needed for chrome) ---------- */
   var langButtons = $$("[data-set-lang]");
   var lang = "es";
   var langBoot = true;
+  var layoutFn = function () {};
   function applyLang(l) {
     lang = l;
     var en = l === "en";
@@ -24,9 +44,9 @@
     root.lang = en ? "en" : "es";
     langButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === l)); });
     try { localStorage.setItem("cv-filo-lang", l); } catch (e) {}
-    formatCounts();
+    if (typeof formatCounts === "function") formatCounts();
     /* Skip layout on first boot — layout() is TBT (measure/pin). Idle after paint. */
-    if (!langBoot) layout();
+    if (!langBoot) layoutFn();
   }
   function initialLang() {
     var requested = new URLSearchParams(window.location.search).get("lang");
@@ -43,15 +63,7 @@
   var y = doc.getElementById("year");
   if (y) y.textContent = String(new Date().getFullYear());
 
-  /* ---------- Contadores: se derivan del propio contenido ---------- */
-  $$("[data-count-of]").forEach(function (el) {
-    var n = $$(el.getAttribute("data-count-of")).length;
-    if (n) el.setAttribute("data-to", String(n));
-  });
-  $$(".proj-group").forEach(function (g) {
-    var c = g.querySelector(".pg-count");
-    if (c) c.textContent = String(g.querySelectorAll(".proj").length).padStart(2, "0");
-  });
+  /* ---------- Contadores (defined early; filled in idle) ---------- */
   function fmt(n, sep) {
     var s = String(Math.round(n));
     if (!sep) return n < 10 ? "0" + s : s;
@@ -74,9 +86,8 @@
     })(t0);
   }
 
-  /* ---------- Título del hero: letter-split AFTER LCP ----------
-     H1 is static HTML (no data-split attr). Paint complete text first.
-     Select #heroName / h1.hero-title only post-load idle (≥2.5s); never translate off-screen. */
+  /* ---------- Título del hero: letter-split AFTER LCP (≥2.5s) ----------
+     H1 is static HTML (no data-split attr). Paint complete text first. */
   function splitHeroTitles(animate) {
     var targets = [];
     var byId = doc.getElementById("heroName");
@@ -95,7 +106,6 @@
               if (!part) return;
               if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
               var w = doc.createElement("span");
-              /* Accent polish post-LCP: Vallejo was plain text on first paint */
               w.className = part === "Vallejo" ? "w accent" : "w";
               w.setAttribute("aria-hidden", "true");
               part.split("").forEach(function (c) {
@@ -111,35 +121,9 @@
       if (animate && !reduce) h.setAttribute("data-entrance", "1");
     });
   }
-  function scheduleHeroSplit() {
-    function run() { splitHeroTitles(true); }
-    function afterLoad(fn) {
-      if (doc.readyState === "complete") fn();
-      else window.addEventListener("load", fn, { once: true });
-    }
-    afterLoad(function () {
-      setTimeout(function () {
-        if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 1200 });
-        else run();
-      }, 2500);
-    });
-  }
-  scheduleHeroSplit();
+  schedulePostLcp(function () { splitHeroTitles(true); });
 
-  /* ---------- Post-LCP idle: defer TBT-heavy hero polish (words + pointer FX) ---------- */
-  function schedulePostLcp(fn) {
-    function afterLoad(run) {
-      if (doc.readyState === "complete") run();
-      else window.addEventListener("load", run, { once: true });
-    }
-    afterLoad(function () {
-      setTimeout(function () {
-        if ("requestIdleCallback" in window) requestIdleCallback(fn, { timeout: 1200 });
-        else fn();
-      }, 2500);
-    });
-  }
-  /* ---------- Palabras que se iluminan (DOM wrap AFTER LCP — was major TBT) ---------- */
+  /* ---------- Palabras que se iluminan (DOM wrap AFTER LCP) ---------- */
   var wordBlocks = [];
   function initWordBlocks() {
     if (wordBlocks.length) return;
@@ -164,47 +148,9 @@
   }
   schedulePostLcp(initWordBlocks);
 
-  /* ---------- Ready (no covering preloader — was ~1.5s+ LCP render delay) ---------- */
+  /* ---------- Ready (no covering preloader) ---------- */
   function ready() { root.classList.add("is-ready"); }
   requestAnimationFrame(function () { requestAnimationFrame(ready); });
-
-  /* ---------- Revelados ---------- */
-  // escalonar hijos de rejillas
-  $$(".proj-grid, .idx, .skills-grid, .contact-grid, .influence-list, .edu").forEach(function (g) {
-    $$("[data-reveal]", g).forEach(function (el, i) { if (!el.style.getPropertyValue("--d")) el.style.setProperty("--d", (i % 6) * 70 + "ms"); });
-  });
-  var revealEls = $$("[data-reveal]");
-  function reveal(el) {
-    el.classList.add("is-in");
-    $$(".count", el).forEach(runCount);
-    if (el.classList.contains("section-label")) scramble(el);
-  }
-  if (reduce || !("IntersectionObserver" in window)) {
-    revealEls.forEach(reveal);
-  } else {
-    // Un elemento recortado a área cero nunca "intersecta": los de tipo clip se
-    // disparan desde su contenedor.
-    var groups = new Map();
-    revealEls.forEach(function (el) {
-      var trg = el.getAttribute("data-reveal") === "clip" ? el.parentElement : el;
-      if (!groups.has(trg)) groups.set(trg, []);
-      groups.get(trg).push(el);
-    });
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        (groups.get(en.target) || []).forEach(reveal);
-        io.unobserve(en.target);
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
-    groups.forEach(function (_, trg) { io.observe(trg); });
-  }
-  $$(".count").forEach(function (el) { if (!el.closest("[data-reveal]")) { if (reduce) runCount(el); else ioCount(el); } });
-  function ioCount(el) {
-    if (!("IntersectionObserver" in window)) return runCount(el);
-    var o = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { runCount(el); o.disconnect(); } }, { threshold: 0.4 });
-    o.observe(el);
-  }
 
   /* ---------- Rótulos que se "descifran" ---------- */
   var GLYPHS = "ΑΒΓΔΘΛΞΠΣΦΨΩ∀∃¬∧∨→⊢⊨";
@@ -226,13 +172,12 @@
     });
   }
 
-  /* ---------- Cabecera, progreso e índice ---------- */
+  /* ---------- Cabecera / menú — LIGHT (listeners only, no measure) ---------- */
   var header = doc.getElementById("header");
   var progress = doc.getElementById("progress");
   var menu = doc.getElementById("menu");
   var menuBtn = doc.getElementById("menu-btn");
   var menuOpen = false, lastScroll = window.scrollY;
-  $$(".menu-sections li").forEach(function (li, i) { li.style.setProperty("--i", i); });
   function setMenu(open) {
     menuOpen = open;
     menu.setAttribute("data-open", String(open));
@@ -247,13 +192,17 @@
     doc.addEventListener("keydown", function (e) { if (e.key === "Escape" && menuOpen) { setMenu(false); menuBtn.focus(); } });
   }
 
-  /* ---------- Áreas: sección fija con 4 pasos ---------- */
-  var areas = doc.getElementById("areas");
-  var panels = $$(".area-panel", areas);
-  var railItems = $$(".areas-rail-item", areas);
-  var areasLine = null;
-  var areaStep = -1;
+  /* Shared scroll/scene state — wired in idle */
+  var areas = null, panels = [], railItems = [], areasLine = null, areaStep = -1;
   var pinnable = window.matchMedia("(min-width: 900px) and (min-height: 560px)");
+  var rail = null, track = null, railBar = null, railShift = 0;
+  var tracks = [];
+  var marquee = null, marqueeOn = false, vel = 0, looping = false, lastT = 0;
+  var currentScene = "hero";
+  var sceneEls = [];
+  var ticking = false;
+  var heavyDone = false;
+
   function setStep(i) {
     if (i === areaStep) return;
     areaStep = i;
@@ -262,25 +211,78 @@
     if (areasLine) areasLine.parentNode.style.setProperty("--c", getComputedStyle(panels[i]).getPropertyValue("--c"));
     if (currentScene === "areas" && window.Ideas) window.Ideas.scene("areas", i);
   }
-  if (areas && !reduce) {
-    var line = doc.createElement("div"); line.className = "areas-line"; line.setAttribute("aria-hidden", "true");
-    areasLine = doc.createElement("span"); line.appendChild(areasLine);
-    areas.querySelector(".areas-sticky").appendChild(line);
-    railItems.forEach(function (b) {
-      b.addEventListener("click", function () {
-        var i = +b.getAttribute("data-step");
-        var top = areas.getBoundingClientRect().top + window.scrollY;
-        var span = areas.offsetHeight - window.innerHeight;
-        window.scrollTo({ top: top + span * ((i + 0.5) / panels.length), behavior: "smooth" });
+
+  function loop() {
+    if (looping || reduce) return;
+    looping = true; lastT = 0;
+    requestAnimationFrame(function step(t) {
+      var dt = Math.min(0.05, (t - (lastT || t)) / 1000); lastT = t;
+      vel *= Math.pow(0.08, dt);
+      tracks.forEach(function (tr) {
+        if (!tr.w) tr.w = tr.el.scrollWidth / 2;
+        tr.x += tr.dir * (40 + Math.abs(vel) * 0.9) * dt;
+        if (tr.x <= -tr.w) tr.x += tr.w;
+        if (tr.x > 0) tr.x -= tr.w;
+        tr.el.style.transform = "translate3d(" + tr.x.toFixed(1) + "px,0,0)";
       });
+      if (marqueeOn) requestAnimationFrame(step); else looping = false;
     });
   }
 
-  /* ---------- Temas: carril horizontal ---------- */
-  var rail = doc.getElementById("temas");
-  var track = doc.getElementById("rail-track");
-  var railBar = doc.getElementById("rail-bar");
-  var railShift = 0;
+  function pickScene() {
+    var mid = window.innerHeight * 0.5, found = null;
+    for (var i = 0; i < sceneEls.length; i++) {
+      var r = sceneEls[i].getBoundingClientRect();
+      if (r.top <= mid && r.bottom > mid) { found = sceneEls[i]; break; }
+    }
+    if (!found) return;
+    var name = found.getAttribute("data-scene");
+    if (name !== currentScene) {
+      currentScene = name;
+      if (window.Ideas) window.Ideas.scene(name, name === "areas" && areaStep >= 0 ? areaStep : undefined);
+    }
+  }
+
+  function onScroll() {
+    var sy = window.scrollY, vh = window.innerHeight;
+    var max = doc.documentElement.scrollHeight - vh;
+    if (progress) progress.style.transform = "scaleX(" + (max > 0 ? sy / max : 0) + ")";
+
+    vel += sy - lastScroll;
+    if (header && !menuOpen) {
+      header.setAttribute("data-scrolled", String(sy > 30));
+    }
+    lastScroll = sy;
+
+    wordBlocks.forEach(function (b) {
+      if (!b.el.offsetParent) return;
+      var r = b.el.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > vh + 100) return;
+      var p = reduce ? 1 : clamp((vh * 0.82 - r.top) / (r.height + vh * 0.3), 0, 1);
+      var lit = p * b.words.length * 1.15;
+      var key = Math.round(lit * 4);
+      if (key === b.last) return;
+      b.last = key;
+      for (var i = 0; i < b.words.length; i++) b.words[i].style.opacity = String(clamp(0.14 + (lit - i) * 0.86, 0.14, 1));
+    });
+
+    if (areas && areas.classList.contains("is-pinned")) {
+      var ar = areas.getBoundingClientRect();
+      var ap = clamp(-ar.top / Math.max(1, ar.height - vh), 0, 0.9999);
+      setStep(Math.floor(ap * panels.length));
+      if (areasLine) areasLine.style.transform = "scaleX(" + ap + ")";
+    }
+
+    if (rail && rail.classList.contains("is-pinned")) {
+      var rr = rail.getBoundingClientRect();
+      var rp = clamp(-rr.top / Math.max(1, rr.height - vh), 0, 1);
+      track.style.transform = "translate3d(" + (-rp * railShift).toFixed(1) + "px,0,0)";
+      if (railBar) railBar.style.transform = "scaleX(" + rp + ")";
+    }
+
+    pickScene();
+    ticking = false;
+  }
 
   function layout() {
     var pin = pinnable.matches && !reduce;
@@ -301,105 +303,132 @@
     }
     onScroll();
   }
+  layoutFn = layout;
 
-  /* ---------- Cinta (velocidad ligada al scroll) ---------- */
-  var tracks = $$(".marquee-track").map(function (t) { return { el: t, x: 0, dir: +t.getAttribute("data-dir") || -1, w: 0 }; });
-  var marquee = doc.querySelector(".marquee");
-  var marqueeOn = false, vel = 0;
-  if (marquee && "IntersectionObserver" in window) {
-    new IntersectionObserver(function (en) { marqueeOn = en[0].isIntersecting; if (marqueeOn) loop(); }).observe(marquee);
+  function reveal(el) {
+    el.classList.add("is-in");
+    $$(".count", el).forEach(runCount);
+    if (el.classList.contains("section-label")) scramble(el);
   }
-  var looping = false, lastT = 0;
-  function loop() {
-    if (looping || reduce) return;
-    looping = true; lastT = 0;
-    requestAnimationFrame(function step(t) {
-      var dt = Math.min(0.05, (t - (lastT || t)) / 1000); lastT = t;
-      vel *= Math.pow(0.08, dt);
-      tracks.forEach(function (tr) {
-        if (!tr.w) tr.w = tr.el.scrollWidth / 2;
-        tr.x += tr.dir * (40 + Math.abs(vel) * 0.9) * dt;
-        if (tr.x <= -tr.w) tr.x += tr.w;
-        if (tr.x > 0) tr.x -= tr.w;
-        tr.el.style.transform = "translate3d(" + tr.x.toFixed(1) + "px,0,0)";
+
+  /* ---------- HEAVY boot in idle slices (TBT / mobile LCP gate) ----------
+     Sync path above is lang + year + menu only.
+     Reveal IO (~135 nodes), areas DOM, marquee, layout() measure → idle. */
+  function initCounters() {
+    $$("[data-count-of]").forEach(function (el) {
+      var n = $$(el.getAttribute("data-count-of")).length;
+      if (n) el.setAttribute("data-to", String(n));
+    });
+    $$(".proj-group").forEach(function (g) {
+      var c = g.querySelector(".pg-count");
+      if (c) c.textContent = String(g.querySelectorAll(".proj").length).padStart(2, "0");
+    });
+  }
+
+  function initReveals() {
+    $$(".proj-grid, .idx, .skills-grid, .contact-grid, .influence-list, .edu").forEach(function (g) {
+      $$("[data-reveal]", g).forEach(function (el, i) { if (!el.style.getPropertyValue("--d")) el.style.setProperty("--d", (i % 6) * 70 + "ms"); });
+    });
+    var revealEls = $$("[data-reveal]");
+    if (reduce || !("IntersectionObserver" in window)) {
+      revealEls.forEach(reveal);
+    } else {
+      var groups = new Map();
+      revealEls.forEach(function (el) {
+        var trg = el.getAttribute("data-reveal") === "clip" ? el.parentElement : el;
+        if (!groups.has(trg)) groups.set(trg, []);
+        groups.get(trg).push(el);
       });
-      if (marqueeOn) requestAnimationFrame(step); else looping = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          (groups.get(en.target) || []).forEach(reveal);
+          io.unobserve(en.target);
+        });
+      }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
+      groups.forEach(function (_, trg) { io.observe(trg); });
+    }
+    $$(".count").forEach(function (el) {
+      if (!el.closest("[data-reveal]")) {
+        if (reduce) runCount(el);
+        else {
+          if (!("IntersectionObserver" in window)) return runCount(el);
+          var o = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { runCount(el); o.disconnect(); } }, { threshold: 0.4 });
+          o.observe(el);
+        }
+      }
     });
   }
-  tracks.forEach(function (tr) { tr.x = tr.dir > 0 ? -200 : 0; });
 
-  /* ---------- Escenas de la constelación ---------- */
-  var currentScene = "hero";
-  var sceneEls = $$("[data-scene]");
-  function pickScene() {
-    var mid = window.innerHeight * 0.5, found = null;
-    for (var i = 0; i < sceneEls.length; i++) {
-      var r = sceneEls[i].getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid) { found = sceneEls[i]; break; }
+  function initAreasRail() {
+    $$(".menu-sections li").forEach(function (li, i) { li.style.setProperty("--i", i); });
+    areas = doc.getElementById("areas");
+    panels = $$(".area-panel", areas);
+    railItems = $$(".areas-rail-item", areas);
+    if (areas && !reduce) {
+      var line = doc.createElement("div"); line.className = "areas-line"; line.setAttribute("aria-hidden", "true");
+      areasLine = doc.createElement("span"); line.appendChild(areasLine);
+      var sticky = areas.querySelector(".areas-sticky");
+      if (sticky) sticky.appendChild(line);
+      railItems.forEach(function (b) {
+        b.addEventListener("click", function () {
+          var i = +b.getAttribute("data-step");
+          var top = areas.getBoundingClientRect().top + window.scrollY;
+          var span = areas.offsetHeight - window.innerHeight;
+          window.scrollTo({ top: top + span * ((i + 0.5) / panels.length), behavior: "smooth" });
+        });
+      });
     }
-    if (!found) return;
-    var name = found.getAttribute("data-scene");
-    if (name !== currentScene) {
-      currentScene = name;
-      if (window.Ideas) window.Ideas.scene(name, name === "areas" && areaStep >= 0 ? areaStep : undefined);
-    }
+    rail = doc.getElementById("temas");
+    track = doc.getElementById("rail-track");
+    railBar = doc.getElementById("rail-bar");
   }
 
-  /* ---------- Scroll (un solo manejador por frame) ---------- */
-  var ticking = false;
-  function onScroll() {
-    var sy = window.scrollY, vh = window.innerHeight;
-    var max = doc.documentElement.scrollHeight - vh;
-    if (progress) progress.style.transform = "scaleX(" + (max > 0 ? sy / max : 0) + ")";
-
-    vel += sy - lastScroll;
-    if (header && !menuOpen) {
-      // La cabecera es siempre visible (lleva los accesos del ecosistema y WhatsApp):
-      // al hacer scroll solo gana fondo sólido, nunca se oculta.
-      header.setAttribute("data-scrolled", String(sy > 30));
+  function initMarqueeScenesScroll() {
+    tracks = $$(".marquee-track").map(function (t) { return { el: t, x: 0, dir: +t.getAttribute("data-dir") || -1, w: 0 }; });
+    marquee = doc.querySelector(".marquee");
+    if (marquee && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { marqueeOn = en[0].isIntersecting; if (marqueeOn) loop(); }).observe(marquee);
     }
-    lastScroll = sy;
+    tracks.forEach(function (tr) { tr.x = tr.dir > 0 ? -200 : 0; });
+    sceneEls = $$("[data-scene]");
 
-    // palabras
-    wordBlocks.forEach(function (b) {
-      if (!b.el.offsetParent) return;
-      var r = b.el.getBoundingClientRect();
-      if (r.bottom < -100 || r.top > vh + 100) return;
-      var p = reduce ? 1 : clamp((vh * 0.82 - r.top) / (r.height + vh * 0.3), 0, 1);
-      var lit = p * b.words.length * 1.15;
-      var key = Math.round(lit * 4);
-      if (key === b.last) return;
-      b.last = key;
-      for (var i = 0; i < b.words.length; i++) b.words[i].style.opacity = String(clamp(0.14 + (lit - i) * 0.86, 0.14, 1));
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    }, { passive: true });
+    var rt;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(layout, 150); });
+    if (pinnable.addEventListener) pinnable.addEventListener("change", layout);
+  }
+
+  function scheduleHeavyBoot() {
+    if (heavyDone) return;
+    heavyDone = true;
+    var steps = [
+      initCounters,
+      initReveals,
+      initAreasRail,
+      initMarqueeScenesScroll,
+      function () { runIdle(layout, 600); }
+    ];
+    var i = 0;
+    function pump(deadline) {
+      var budget = deadline && typeof deadline.timeRemaining === "function"
+        ? deadline.timeRemaining()
+        : 12;
+      var start = performance.now();
+      while (i < steps.length && (performance.now() - start < Math.max(8, budget))) {
+        steps[i++]();
+      }
+      if (i < steps.length) runIdle(pump, 400);
+    }
+    /* Start after first paint: double-rAF then idle — clears mobile LCP window */
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { runIdle(pump, 200); });
     });
-
-    // áreas fijas
-    if (areas && areas.classList.contains("is-pinned")) {
-      var ar = areas.getBoundingClientRect();
-      var ap = clamp(-ar.top / Math.max(1, ar.height - vh), 0, 0.9999);
-      setStep(Math.floor(ap * panels.length));
-      if (areasLine) areasLine.style.transform = "scaleX(" + ap + ")";
-    }
-
-    // carril
-    if (rail && rail.classList.contains("is-pinned")) {
-      var rr = rail.getBoundingClientRect();
-      var rp = clamp(-rr.top / Math.max(1, rr.height - vh), 0, 1);
-      track.style.transform = "translate3d(" + (-rp * railShift).toFixed(1) + "px,0,0)";
-      if (railBar) railBar.style.transform = "scaleX(" + rp + ")";
-    }
-
-    pickScene();
-    ticking = false;
   }
-  window.addEventListener("scroll", function () {
-    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
-  }, { passive: true });
-  var rt;
-  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(layout, 150); });
-  if (pinnable.addEventListener) pinnable.addEventListener("change", layout);
 
-  /* ---------- Cursor / magnetic / card tilt — AFTER LCP (pointer FX is TBT) ---------- */
+  /* ---------- Cursor / magnetic / card tilt — AFTER LCP (≥2.5s) ---------- */
   schedulePostLcp(function initPointerFx() {
     if (!(finePointer && !reduce)) return;
 
@@ -437,18 +466,15 @@
       });
       c.addEventListener("pointerleave", function () { c.style.transform = ""; });
     });
-    });
+  });
 
-  /* ---------- Arranque ---------- */
+  /* ---------- Arranque LIGHT ---------- */
   applyLang(initialLang());
   langBoot = false;
-  function scheduleLayout(fn) {
-    if ("requestIdleCallback" in window) requestIdleCallback(fn, { timeout: 600 });
-    else setTimeout(fn, 1);
-  }
-  scheduleLayout(layout);
-  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { tracks.forEach(function (t) { t.w = 0; }); scheduleLayout(layout); });
-  window.addEventListener("load", function () { scheduleLayout(layout); });
+  scheduleHeavyBoot();
+  /* Re-measure after fonts / full load — still idle, never sync on boot */
+  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { tracks.forEach(function (t) { t.w = 0; }); runIdle(layout, 600); });
+  window.addEventListener("load", function () { runIdle(layout, 600); });
 })();
 
 /* =========================================================
