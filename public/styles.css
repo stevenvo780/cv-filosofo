@@ -555,10 +555,17 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
 .hero-title .accent,
 .hero-title .w.accent,
 .hero-title .w.accent .c { font-style: italic; color: var(--gold); padding-right: 0.04em; }
-/* Letter polish (JS may wrap .w > .c AFTER LCP). Never hide H1 off-screen — LCP render-delay.
-   Entrance only when [data-entrance] is set before wrap; deferred path keeps text fully visible. */
-.hero-title .w { display: inline-block; overflow: visible; padding: 0.04em 0.08em 0.14em 0.02em; margin: -0.04em -0.08em -0.14em -0.02em; vertical-align: top; }
-.hero-title .c { display: inline-block; translate: 0 0; rotate: 0deg; }
+/* Letter wrap AFTER LCP. Default .w/.c stay inline (paint/layout-neutral vs plain
+   text) so deferred split does not create a new LCP. Inline-block + entrance
+   animation only when [data-entrance] is set (sync/boot path). */
+.hero-title .w { display: inline; padding: 0; margin: 0; vertical-align: baseline; }
+.hero-title .c { display: inline; translate: 0 0; rotate: 0deg; }
+html.js .hero-title[data-entrance] .w {
+  display: inline-block; overflow: visible;
+  padding: 0.04em 0.08em 0.14em 0.02em; margin: -0.04em -0.08em -0.14em -0.02em;
+  vertical-align: top;
+}
+html.js .hero-title[data-entrance] .c { display: inline-block; }
 html.js .hero-title[data-entrance] .c {
   animation: heroCharIn 1.05s var(--ease-out) forwards;
   animation-delay: calc(var(--i) * 32ms + 40ms);

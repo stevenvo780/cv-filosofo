@@ -16,7 +16,10 @@
 
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var W = 0, H = 0, DPR = 1, mobile = false;
-  var quality = 1; // 1 = completo, 0 = reducido (se ajusta solo)
+  /* Mobile starts reduced: full quality on mid-tier LH was a multi-second
+     long task (b5ff270 TBT ~8s outlier). Desktop keeps full quality. */
+  var quality = (typeof window !== "undefined" && window.matchMedia &&
+    window.matchMedia("(max-width: 767px), (pointer: coarse)").matches) ? 0 : 1;
 
   /* ---------- Paleta ---------- */
   var C = {
