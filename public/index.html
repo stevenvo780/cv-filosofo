@@ -90,7 +90,7 @@
 <!-- Wave3 SEO/Perf: self-host Cormorant/Inter/JetBrains (latin) — same faces, no render-blocking googleapis.
      EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS).
      LCP = h1.hero-title PLAIN TEXT (no data-split, no .ln spans): preload H1 woff2; critical ATF CSS;
-     styles.css non-blocking (media=print onload); letter-split/accent only post-LCP idle ≥2.5s. No covering preloader. -->
+     styles.css RENDER-BLOCKING (cv-informatico 7c0ce9a — async media=print FOUC → CLS 1.0). Letter-split ≥2.5s idle. No covering preloader. -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
@@ -100,7 +100,7 @@
   })(document);
 </script>
 <style id="critical-hero">
-  /* ATF critical: H1 + hero + header reserve — styles.css loads non-blocking (cv-informatico pattern) */
+  /* ATF critical: H1 + hero + header reserve — styles.css is render-blocking (7c0ce9a); critical matches final ATF to cut FOUC/CLS */
   @font-face {
     font-family: "Cormorant Garamond Fallback";
     src: local("Georgia"), local("Times New Roman"), local("Times"), local("Noto Serif"), local("DejaVu Serif");
@@ -156,8 +156,7 @@
   /* ATF hero reveals stay visible until full CSS + IO (no flash to opacity:0) */
   html.js .hero [data-reveal] { opacity: 1; translate: none; filter: none; clip-path: none; }
 </style>
-<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'" />
-<noscript><link rel="stylesheet" href="styles.css" /></noscript>
+<link rel="stylesheet" href="styles.css" />
 
 <!-- JSON-LD — datos estructurados (5 scripts + 1 graph) -->
 <!-- 1) Person — sujeto del CV -->
