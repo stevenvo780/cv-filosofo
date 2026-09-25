@@ -72,29 +72,50 @@
     })(t0);
   }
 
-  /* ---------- Título del hero: letras envueltas ---------- */
-  $$("[data-split]").forEach(function (h) {
-    h.setAttribute("aria-label", h.textContent.replace(/\s+/g, " ").trim());
-    var i = 0;
-    (function walk(node) {
-      Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
-        if (ch.nodeType === 3) {
-          var frag = doc.createDocumentFragment();
-          ch.textContent.split(/(\s+)/).forEach(function (part) {
-            if (!part) return;
-            if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
-            var w = doc.createElement("span"); w.className = "w"; w.setAttribute("aria-hidden", "true");
-            part.split("").forEach(function (c) {
-              var s = doc.createElement("span"); s.className = "c"; s.textContent = c;
-              s.style.setProperty("--i", i++); w.appendChild(s);
+  /* ---------- Título del hero: letter-split AFTER LCP ----------
+     H1 must paint as complete text first (render-delay was ~79% of LCP).
+     Wrap + soft entrance only post-load idle (≥2.5s); never translate off-screen. */
+  function splitHeroTitles(animate) {
+    $$("[data-split]").forEach(function (h) {
+      if (h.getAttribute("data-split-done")) return;
+      h.setAttribute("data-split-done", "1");
+      h.setAttribute("aria-label", h.textContent.replace(/\s+/g, " ").trim());
+      var i = 0;
+      (function walk(node) {
+        Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
+          if (ch.nodeType === 3) {
+            var frag = doc.createDocumentFragment();
+            ch.textContent.split(/(\s+)/).forEach(function (part) {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(doc.createTextNode(" ")); return; }
+              var w = doc.createElement("span"); w.className = "w"; w.setAttribute("aria-hidden", "true");
+              part.split("").forEach(function (c) {
+                var s = doc.createElement("span"); s.className = "c"; s.textContent = c;
+                s.style.setProperty("--i", i++); w.appendChild(s);
+              });
+              frag.appendChild(w);
             });
-            frag.appendChild(w);
-          });
-          ch.parentNode.replaceChild(frag, ch);
-        } else if (ch.nodeType === 1) walk(ch);
-      });
-    })(h);
-  });
+            ch.parentNode.replaceChild(frag, ch);
+          } else if (ch.nodeType === 1) walk(ch);
+        });
+      })(h);
+      if (animate && !reduce) h.setAttribute("data-entrance", "1");
+    });
+  }
+  function scheduleHeroSplit() {
+    function run() { splitHeroTitles(true); }
+    function afterLoad(fn) {
+      if (doc.readyState === "complete") fn();
+      else window.addEventListener("load", fn, { once: true });
+    }
+    afterLoad(function () {
+      setTimeout(function () {
+        if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 1200 });
+        else run();
+      }, 2500);
+    });
+  }
+  scheduleHeroSplit();
 
   /* ---------- Palabras que se iluminan con el scroll ---------- */
   var wordBlocks = $$("[data-words]").map(function (el) {
@@ -116,31 +137,9 @@
     return { el: el, words: words, last: -1 };
   });
 
-  /* ---------- Preloader (1.ª visita de la sesión) ---------- */
+  /* ---------- Ready (no covering preloader — was ~1.5s+ LCP render delay) ---------- */
   function ready() { root.classList.add("is-ready"); }
-  var pre = doc.querySelector(".preloader");
-  if (root.classList.contains("intro-pending") && pre) {
-    var cnt = doc.getElementById("pl-count"), bar = doc.getElementById("pl-bar");
-    var t0 = performance.now(), minDur = 1500, fontsOk = false;
-    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { fontsOk = true; }); else fontsOk = true;
-    (function tick(now) {
-      var p = clamp((now - t0) / minDur, 0, 1);
-      if (!fontsOk) p = Math.min(p, 0.9);
-      var e = 1 - Math.pow(1 - p, 3);
-      if (cnt) cnt.textContent = String(Math.round(e * 100)).padStart(2, "0");
-      if (bar) bar.style.transform = "scaleX(" + e + ")";
-      if (p < 1 || !fontsOk) {
-        if (now - t0 < 5000) return requestAnimationFrame(tick);
-      }
-      pre.setAttribute("data-phase", "leaving");
-      root.classList.remove("intro-pending");
-      try { sessionStorage.setItem("filo-intro", "1"); } catch (e2) {}
-      setTimeout(ready, 280);
-      setTimeout(function () { pre.removeAttribute("data-phase"); }, 1300);
-    })(t0);
-  } else {
-    requestAnimationFrame(function () { requestAnimationFrame(ready); });
-  }
+  requestAnimationFrame(function () { requestAnimationFrame(ready); });
 
   /* ---------- Revelados ---------- */
   // escalonar hijos de rejillas
