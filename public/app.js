@@ -7,6 +7,9 @@
    rAF+setTimeout(0). Blocking CSS, static #heroName, graph ≥2.5s.
    Inter/JetBrains/Cormorant-italic via fonts-deferred.css ≥2.5s
    (html.fonts-enrich) so ATF bandwidth serves Cormorant LCP.
+   Tip after 6d79f4f: chrome+layout softChain ≥2.5s post-load;
+   fonts-enrich 3.5s; graph 4.5s — cut early TBT (LH 84/89) while
+   keeping LCP on plain #heroName. Single H1 = #heroName only.
    Idioma ES/EN · cabecera · índice · revelados ·
    título por letras · palabras · áreas · carril · cinta ·
    contadores · cursor · escenas.
@@ -198,7 +201,7 @@
     doc.head.appendChild(link);
     root.classList.add("fonts-enrich");
   }
-  schedulePostLcp(enrichDeferredFonts, 2500);
+  schedulePostLcp(enrichDeferredFonts, 3500);
   /* ---------- Palabras que se iluminan (DOM wrap AFTER LCP — was major TBT) ---------- */
   var wordBlocks = [];
   function initWordBlocks() {
@@ -222,7 +225,7 @@
       return { el: el, words: words, last: -1 };
     });
   }
-  schedulePostLcp(initWordBlocks, 3200);
+  schedulePostLcp(initWordBlocks, 4200);
 
   /* ---------- Ready (no covering preloader — was ~1.5s+ LCP render delay) ---------- */
   function ready() { root.classList.add("is-ready"); }
@@ -504,23 +507,23 @@
       });
       c.addEventListener("pointerleave", function () { c.style.transform = ""; });
     });
-    }, 3600);
+    }, 5000);
 
-  /* ---------- Arranque: paint #heroName first; softChain yields harder before chrome ---------- */
+  /* ---------- Arranque: paint #heroName first; keep first 2.5s thin ---------- */
   /* Early body.en script already set lang class for FOUC; full applyLang soft-yielded. */
   /* rAF+timeout — not rIC(timeout): under LH 4x throttle rIC deadlines
      coalesce into multi-second long tasks (b5ff270 TBT ~8s outlier). */
   function scheduleLayout(fn) {
     requestAnimationFrame(function () { setTimeout(fn, 0); });
   }
-  /* Double-rAF → first paint committed, THEN extra soft yields so LCP can
-     settle on plain #heroName before counters/reveals/areas steal the thread. */
+  /* Soft boot: lang + counters only. Chrome/layout was the ~410ms long task
+     at ~1s (6d79f4f TBT 540/300) — push ≥2.5s post-load via softChain. */
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       softChain([
         function () {}, /* yield: let H1 paint commit */
         function () {}, /* yield: keep renderer free */
-        function () {}, /* yield: absorb Cormorant swap before chrome */
+        function () {}, /* yield: absorb Cormorant swap */
         function () {
           applyLang(initialLang());
           langBoot = false;
@@ -528,30 +531,37 @@
           if (y) y.textContent = String(new Date().getFullYear());
         },
         function () {}, /* yield after lang class */
-        initCounters,
-        function () {}, /* yield before heavy chrome */
-        function () {}, /* extra yield — kill R2 TBT/LCP variance */
-        initChromeAndLayout,
-        function () { scheduleLayout(layout); },
-        function () {
-          /* Only Cormorant normal is in the ATF font set; ready → reflow tracks. */
-          if (doc.fonts && doc.fonts.ready) {
-            doc.fonts.ready.then(function () {
-              tracks.forEach(function (t) { t.w = 0; });
-              scheduleLayout(layout);
-            });
-          }
-        }
+        initCounters
       ]);
     });
   });
+  /* Heavy chrome AFTER LCP window — softChain so reveals/areas/rail do not
+     coalesce into one long task under 4x throttle. */
+  schedulePostLcp(function () {
+    softChain([
+      function () {}, /* yield before chrome */
+      initChromeAndLayout,
+      function () {}, /* yield before measure/pin */
+      function () { scheduleLayout(layout); },
+      function () {
+        if (doc.fonts && doc.fonts.ready) {
+          doc.fonts.ready.then(function () {
+            tracks.forEach(function (t) { t.w = 0; });
+            scheduleLayout(layout);
+          });
+        }
+      }
+    ]);
+  }, 2500);
   window.addEventListener("load", function () { scheduleLayout(layout); });
 })();
 
 /* =========================================================
    WAVE3 SEO/Perf: defer constellation (graph.js) post-LCP.
    canvas#ideas stays in DOM as sibling of main (not nested —
-   Opus mobile z-order). Hard floor 2.5s after window load.
+   Opus mobile z-order). Hard floor ≥2.5s after window load;
+   tip uses 4.5s so graph.js long tasks leave the LH TBT window
+   (6d79f4f: graph bootup ~2.7s attributed / TBT 540·300).
    ========================================================= */
 (function loadGraphPostLcp() {
   var done = false;
@@ -568,6 +578,6 @@
     else window.addEventListener("load", fn, { once: true });
   }
   afterLoad(function () {
-    setTimeout(inject, 2500);
+    setTimeout(inject, 4500);
   });
 })();

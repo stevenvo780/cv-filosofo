@@ -10,7 +10,9 @@
      (fetchpriority=high). softChain double-rAF — NO rIC/idle-chunk (b5ff270 TBT ~8s).
      swap + Georgia (no optional; no webfont size-adjust). Letter-split ≥2.5s. graph ≥2.5s.
      Opus: canvas#ideas sibling of main (not nested) + #heroName z-index above canvas.
-     ATF: only Cormorant normal contended; Inter/JetBrains/italic → fonts-deferred ≥2.5s. -->
+     ATF: only Cormorant normal contended; Inter/JetBrains/italic → fonts-deferred ≥2.5s.
+     SEO P1: exactly ONE H1 (#heroName) — no dual ES/EN H1 (prod still has 2×).
+     Tip: chrome≥2.5s · fonts-enrich 3.5s · graph 4.5s (TBT floor, LCP hold). -->
 <link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
@@ -228,8 +230,9 @@
       <span class="hero-greek" lang="grc" aria-hidden="true">φιλόσοφος</span>
     </div>
 
-    <!-- Wave3: single indexable H1 (name identical ES/EN). Static HTML — no data-split attr. -->
-    <!-- Plain H1 text first (LCP = text). <br> keeps 2-line Opus; letter-split+accent via #heroName ≥2.5s post-load idle. -->
+    <!-- Wave3 SEO: EXACTLY one H1 on the page = #heroName (LCP name). No ES/EN dual H1. -->
+    <!-- Static HTML — no data-split attr. Plain text first (LCP). <br> keeps 2-line Opus;
+         letter-split+accent via #heroName interaction-only ≥2.5s post-load. -->
     <h1 class="hero-title" id="heroName">Steven<br>Vallejo Ortiz</h1>
 
     <div class="hero-sub">
@@ -1238,7 +1241,7 @@
 }
 </script>
 
-<!-- Wave3: graph.js injected ≥2.5s post-load from app.js (keeps canvas#ideas constellation; avoids LCP fight) -->
+<!-- Wave3: graph.js injected ≥2.5s post-load from app.js (tip: 4.5s — TBT floor; keeps #ideas; avoids LCP fight) -->
 <script src="app.js" defer></script>
 </body>
 </html>
