@@ -16,6 +16,7 @@
   /* ---------- Idioma ES (defecto) / EN ---------- */
   var langButtons = $$("[data-set-lang]");
   var lang = "es";
+  var langBoot = true;
   function applyLang(l) {
     lang = l;
     var en = l === "en";
@@ -24,7 +25,8 @@
     langButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === l)); });
     try { localStorage.setItem("cv-filo-lang", l); } catch (e) {}
     formatCounts();
-    layout();
+    /* Skip layout on first boot — layout() is TBT (measure/pin). Idle after paint. */
+    if (!langBoot) layout();
   }
   function initialLang() {
     var requested = new URLSearchParams(window.location.search).get("lang");
@@ -73,10 +75,14 @@
   }
 
   /* ---------- Título del hero: letter-split AFTER LCP ----------
-     H1 must paint as complete text first (render-delay was ~79% of LCP).
-     Wrap + soft entrance only post-load idle (≥2.5s); never translate off-screen. */
+     H1 is static HTML (no data-split attr). Paint complete text first.
+     Select #heroName / h1.hero-title only post-load idle (≥2.5s); never translate off-screen. */
   function splitHeroTitles(animate) {
-    $$("[data-split]").forEach(function (h) {
+    var targets = [];
+    var byId = doc.getElementById("heroName");
+    if (byId) targets.push(byId);
+    else $$("h1.hero-title").forEach(function (h) { targets.push(h); });
+    targets.forEach(function (h) {
       if (h.getAttribute("data-split-done")) return;
       h.setAttribute("data-split-done", "1");
       h.setAttribute("aria-label", h.textContent.replace(/\s+/g, " ").trim());
@@ -435,8 +441,14 @@
 
   /* ---------- Arranque ---------- */
   applyLang(initialLang());
-  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { tracks.forEach(function (t) { t.w = 0; }); layout(); });
-  window.addEventListener("load", layout);
+  langBoot = false;
+  function scheduleLayout(fn) {
+    if ("requestIdleCallback" in window) requestIdleCallback(fn, { timeout: 600 });
+    else setTimeout(fn, 1);
+  }
+  scheduleLayout(layout);
+  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { tracks.forEach(function (t) { t.w = 0; }); scheduleLayout(layout); });
+  window.addEventListener("load", function () { scheduleLayout(layout); });
 })();
 
 /* =========================================================

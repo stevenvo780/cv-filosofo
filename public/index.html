@@ -89,9 +89,9 @@
 
 <!-- Wave3 SEO/Perf: self-host Cormorant/Inter/JetBrains (latin) — same faces, no render-blocking googleapis.
      EB Garamond for Greek falls back to Cormorant via --font-greek stack (no blocking CSS).
-     LCP = h1.hero-title PLAIN TEXT (no .ln spans): preload exact H1 woff2; critical @font-face + metrics;
-     letter-split / italic accent only post-LCP (≥2.5s). No covering preloader. -->
-<link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin />
+     LCP = h1.hero-title PLAIN TEXT (no data-split, no .ln spans): preload H1 woff2; critical ATF CSS;
+     styles.css non-blocking (media=print onload); letter-split/accent only post-LCP idle ≥2.5s. No covering preloader. -->
+<link rel="preload" href="fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high" />
 <script>
   /* Marca JS temprano (revelados). No intro-pending: covering preloader delayed LCP ~1.5s+. */
   (function (d) {
@@ -99,8 +99,16 @@
     try { sessionStorage.setItem("filo-intro", "1"); } catch (e) {}
   })(document);
 </script>
-<style>
-  /* Critical path: discover Cormorant before styles.css; swap + matched fallback keeps CLS stable */
+<style id="critical-hero">
+  /* ATF critical: H1 + hero + header reserve — styles.css loads non-blocking (cv-informatico pattern) */
+  @font-face {
+    font-family: "Cormorant Garamond Fallback";
+    src: local("Georgia"), local("Times New Roman"), local("Times"), local("Noto Serif"), local("DejaVu Serif");
+    size-adjust: 103%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+  }
   @font-face {
     font-family: "Cormorant Garamond";
     font-style: normal;
@@ -108,27 +116,48 @@
     font-display: swap;
     src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
   }
-  /* Metric-matched Georgia fallback keeps the swap CLS-safe */
-  @font-face {
-    font-family: "Cormorant Garamond Fallback";
-    src: local("Georgia"), local("Times New Roman");
-    size-adjust: 103%;
-    ascent-override: 90%;
-    descent-override: 22%;
-    line-gap-override: 0%;
+  html, body { margin: 0; background: #070d10; color: #e8e0d4; }
+  body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
   }
+  .preloader { display: none !important; }
+  .site-header {
+    position: fixed; inset: 0 0 auto 0; z-index: 60; height: 72px;
+  }
+  .hero {
+    position: relative; min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column;
+    padding: calc(72px + 1.5rem) clamp(1rem, 4vw, 3.5rem) 1.75rem;
+    max-width: 1600px; margin-inline: auto;
+  }
+  .hero-inner { flex: 1; display: flex; flex-direction: column; justify-content: center; }
   .hero-title {
+    margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
     font-family: "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
     font-weight: 500;
     font-size: clamp(3.6rem, 11.2vw, 13rem);
     line-height: 0.84;
     letter-spacing: -0.045em;
     color: #e8e0d4;
+    text-shadow: 0 10px 60px rgba(5, 10, 12, 0.45);
     visibility: visible;
     opacity: 1;
   }
+  @media (max-width: 767px) {
+    .hero { padding-top: calc(72px + 38vh); }
+    .hero-inner { justify-content: flex-end; }
+    .hero-title { margin-top: 1rem; font-size: clamp(3.3rem, 16.5vw, 5rem); }
+  }
+  /* Avoid bilingual FOUC before styles.css; keep #ideas invisible until graph ready */
+  body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important; }
+  .ideas { opacity: 0; pointer-events: none; }
+  /* ATF hero reveals stay visible until full CSS + IO (no flash to opacity:0) */
+  html.js .hero [data-reveal] { opacity: 1; translate: none; filter: none; clip-path: none; }
 </style>
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="styles.css" /></noscript>
 
 <!-- JSON-LD — datos estructurados (5 scripts + 1 graph) -->
 <!-- 1) Person — sujeto del CV -->
@@ -475,9 +504,9 @@
       <span class="hero-greek" lang="grc" aria-hidden="true">φιλόσοφος</span>
     </div>
 
-    <!-- Wave3: single indexable H1 (name identical ES/EN); keep data-split for letter reveal -->
-    <!-- Wave3: plain H1 text first (LCP = text, not span.ln). <br> keeps 2-line Opus layout; letter-split+accent ≥2.5s post-load. -->
-    <h1 class="hero-title" data-split>Steven<br>Vallejo Ortiz</h1>
+    <!-- Wave3: single indexable H1 (name identical ES/EN). Static HTML — no data-split attr. -->
+    <!-- Plain H1 text first (LCP = text). <br> keeps 2-line Opus; letter-split+accent via #heroName ≥2.5s post-load idle. -->
+    <h1 class="hero-title" id="heroName">Steven<br>Vallejo Ortiz</h1>
 
     <div class="hero-sub">
       <p class="hero-kicker" data-reveal="up" data-lang-es>Pensar antes de construir.</p>
