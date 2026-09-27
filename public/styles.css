@@ -1,4 +1,30 @@
 /* =========================================================
+   Self-hosted latin subsets (Wave3 SEO/Perf)
+   Faces: Cormorant Garamond + Inter + JetBrains Mono — Paideía / Opus look.
+   EB Garamond (Greek) intentionally not self-hosted; falls back to Cormorant.
+   font-display:swap + Georgia fallback (no webfont size-adjust); Fallback metrics CLS-safe.
+   ========================================================= */
+/* Adjusted system fallback ≈ Cormorant metrics so font-display:swap stays CLS-safe */
+@font-face {
+  font-family: "Cormorant Garamond Fallback";
+  src: local("Georgia"), local("Times New Roman"), local("Times"), local("Noto Serif"), local("DejaVu Serif");
+  size-adjust: 103%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+/* Self-hosted latin woff2 — keep metrics on the fallback, not the webfont */
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("fonts/cormorant-garamond-latin.woff2") format("woff2");
+}
+/* Inter / JetBrains / Cormorant-italic live in fonts-deferred.css (softChain ≥2.5s).
+   Blocking sheet keeps only Cormorant normal for #heroName LCP bandwidth. */
+
+/* =========================================================
    CV Filósofo — Steven Vallejo Ortiz
    Estética Paideía (Mouseîon): noche profunda, oro, teal, violeta
    y terracota; Cormorant para la voz, JetBrains Mono para los
@@ -29,11 +55,19 @@
   --maxw: 1440px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
-  --font-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;
-  --font-greek: "EB Garamond", "Cormorant Garamond", Georgia, serif;
+  /* ATF: system body/mono — Inter/JetBrains deferred so they do not contend with Cormorant LCP. */
+  --font-display: "Cormorant Garamond", "Cormorant Garamond Fallback", "EB Garamond", Georgia, serif;
+  --font-greek: "Cormorant Garamond Fallback", Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Fira Code", Consolas, monospace;
+}
+/* Post-LCP face enrichment (fonts-deferred.css + this class via softChain ≥2.5s) */
+html.fonts-enrich {
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Fira Code", Consolas, monospace;
+  --font-greek: "EB Garamond", "Cormorant Garamond", "Cormorant Garamond Fallback", Georgia, serif;
 }
+
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -102,7 +136,24 @@ body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important;
     radial-gradient(40% 40% at 90% 8%, rgba(67, 181, 166, 0.10), transparent 70%),
     linear-gradient(180deg, #0a1216 0%, #070d10 100%);
 }
+.ideas-ph {
+  /* Opus HARD_BLOCK: visible constellation silhouette from first paint (not empty void)
+     until graph.js marks canvas#ideas.is-ready. Same z-layer as canvas (1), under hero (2). */
+  position: fixed; left: 0; top: 0; z-index: 1;
+  width: 100%; height: 100vh; height: 100lvh;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.9s ease, visibility 0s linear 0s;
+}
+.ideas-ph svg { width: 100%; height: 100%; display: block; }
+.ideas-ph.is-hidden {
+  visibility: hidden; opacity: 0;
+  transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+}
 .ideas {
+  /* Sibling of main (not inside it): z-index 1 under main/footer (2).
+     Opus HARD_BLOCK: nesting under main buried #heroName on mobile.
+     Opacity 0 until .is-ready — placeholder (#ideasPh) covers the void. */
   position: fixed; left: 0; top: 0; z-index: 1;
   width: 100%; height: 100vh; height: 100lvh;
   pointer-events: none;
@@ -130,6 +181,7 @@ body:not(.en) [data-lang-en], body.en [data-lang-es] { display: none !important;
   transform-origin: 0 50%; transform: scaleX(0); pointer-events: none;
 }
 
+/* Capas (.ideas z:1) must be siblings of main — not descendants — or they bury content. */
 main, .site-footer { position: relative; z-index: 2; }
 main { outline: none; }
 
@@ -479,12 +531,13 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
    Hero
    ========================================================= */
 .hero {
-  position: relative; min-height: 100vh; min-height: 100svh;
+  /* z-index above canvas#ideas (belt-and-suspenders; main also z-index:2). */
+  position: relative; z-index: 2; min-height: 100vh; min-height: 100svh;
   display: flex; flex-direction: column;
   padding: calc(var(--header-h) + 1.5rem) var(--gutter) 1.75rem;
   max-width: 1600px; margin-inline: auto;
 }
-.hero-inner { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.hero-inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .eyebrow-dot {
   width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
@@ -495,24 +548,50 @@ html.js [data-reveal="clip"].is-in { clip-path: polygon(-10% -35%, 110% -35%, 11
   letter-spacing: 0.06em; color: var(--gold);
 }
 .hero-title {
+  /* Opus: name must paint above canvas#ideas (mobile DOM-present-but-buried). */
+  position: relative; z-index: 2;
   margin: clamp(1.5rem, 5vh, 3.5rem) 0 0 -0.04em;
   font-family: var(--font-display); font-weight: 500;
   font-size: clamp(3.6rem, 11.2vw, 13rem); line-height: 0.84; letter-spacing: -0.045em;
-  color: var(--text); text-shadow: 0 10px 60px rgba(5, 10, 12, 0.45);
+  color: var(--text); /* LCP: no soft glow — cheaper #heroName paint */
 }
 .hero-title .ln { display: block; }
-.hero-title .accent { font-style: italic; color: var(--gold); padding-right: 0.04em; }
-/* Letras que suben (JS las envuelve en .w > .c) */
-.hero-title .w { display: inline-block; overflow: hidden; padding: 0.04em 0.08em 0.14em 0.02em; margin: -0.04em -0.08em -0.14em -0.02em; vertical-align: top; }
-.hero-title .c { display: inline-block; }
-html.js .hero-title .c { translate: 0 112%; rotate: 6deg; }
-html.js.is-ready .hero-title .c {
-  translate: 0 0; rotate: 0deg;
-  transition: translate 1.25s var(--ease-out), rotate 1.25s var(--ease-out);
-  transition-delay: calc(var(--i) * 38ms + 80ms);
+/* Accent may be on inline span (legacy) or on .w after post-LCP letter-split */
+.hero-title .accent,
+.hero-title .w.accent,
+.hero-title .w.accent .c { font-style: italic; color: var(--gold); padding-right: 0.04em; }
+/* Letter wrap AFTER LCP. Default .w/.c stay inline (paint/layout-neutral vs plain
+   text) so deferred split does not create a new LCP. Inline-block + entrance
+   animation only when [data-entrance] is set (sync/boot path). */
+.hero-title .w { display: inline; padding: 0; margin: 0; vertical-align: baseline; }
+.hero-title .c { display: inline; translate: 0 0; rotate: 0deg; }
+html.js .hero-title[data-entrance] .w {
+  display: inline-block; overflow: visible;
+  padding: 0.04em 0.08em 0.14em 0.02em; margin: -0.04em -0.08em -0.14em -0.02em;
+  vertical-align: top;
 }
-@media (prefers-reduced-motion: reduce) { html.js .hero-title .c { translate: none; rotate: none; } }
+html.js .hero-title[data-entrance] .c { display: inline-block; }
+html.js .hero-title[data-entrance] .c {
+  animation: heroCharIn 1.05s var(--ease-out) forwards;
+  animation-delay: calc(var(--i) * 32ms + 40ms);
+}
+@keyframes heroCharIn {
+  from { translate: 0 0.18em; }
+  to { translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .hero-title[data-entrance] .c { animation: none; }
+}
 
+/* ATF italic copy on Fallback until fonts-enrich (no Cormorant-italic woff2 on critical path). */
+.hero-kicker, .hero-epigraph, .hero-greek {
+  font-family: "Cormorant Garamond Fallback", Georgia, serif;
+}
+html.fonts-enrich .hero-kicker,
+html.fonts-enrich .hero-epigraph,
+html.fonts-enrich .hero-greek {
+  font-family: var(--font-display);
+}
 .hero-sub { margin-top: clamp(1.4rem, 4vh, 2.6rem); max-width: 46rem; }
 .hero-epigraph, .hero-kicker { max-width: 36rem; }
 .hero-kicker {
@@ -1055,7 +1134,7 @@ html.js.is-ready .hero-title .c {
 
 /* ---------- impresión ---------- */
 @media print {
-  .site-header, .menu, .preloader, .ideas, .bg-nebula, .grain, .cursor, .scroll-progress, .marquee, .btn-row, .hero-actions { display: none !important; }
+  .site-header, .menu, .preloader, .ideas, .ideas-ph, .bg-nebula, .grain, .cursor, .scroll-progress, .marquee, .btn-row, .hero-actions { display: none !important; }
   body { background: #fff; color: #111; }
   html.js [data-reveal] { opacity: 1 !important; translate: none !important; clip-path: none !important; filter: none !important; }
 }
