@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx --yes serve@14 -l 4321 .",
     "start": "npx --yes serve@14 -l 4321 .",
-    "build": "echo 'static site — no build step required'"
+    "build": "node scripts/build.mjs"
   },
   "license": "UNLICENSED"
 }
