@@ -21,9 +21,9 @@ SEO: `<title>`, `meta description`/`keywords`, Open Graph y **JSON-LD `schema.or
 ## Desarrollo local
 
 ```bash
-npx --yes serve@14 -l 4321 .
+npx --yes serve@14 -l 4321 public
 # o cualquier servidor estático
-python3 -m http.server 4321
+python3 -m http.server 4321 --directory public
 ```
 
 Abrir http://localhost:4321 — la versión EN en http://localhost:4321/?lang=en
